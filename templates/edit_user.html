@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier utilisateur</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier utilisateur</h2>
+        <p class="subtitle">Modifiez les informations de l'utilisateur</p>
+
+        <form method="POST" action="/users/update/{{ user.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Nom d'utilisateur</label>
+                    <input name="username" value="{{ user.username }}">
+                </div>
+
+                <div class="form-row">
+                    <label>Email</label>
+                    <input name="email" value="{{ user.email }}">
+                </div>
+
+                <div class="form-row">
+                    <label>Mot de passe</label>
+                    <input name="password" type="password" value="{{ user.password }}">
+                </div>
+
+                <div class="form-row">
+                    <label>Rôle</label>
+                    <select name="role">
+                        <option value="admin" {% if user.role == "admin" %}selected{% endif %}>Admin</option>
+                        <option value="user" {% if user.role == "user" %}selected{% endif %}>User</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/users" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

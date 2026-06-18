@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier produit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier produit</h2>
+        <p class="subtitle">Modifiez les informations du produit</p>
+
+        <form method="POST" action="/produits/update/{{ produit.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Nom du produit</label>
+                    <input name="nom" value="{{ produit.nom }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/produits" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

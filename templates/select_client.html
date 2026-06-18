@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">>
+</head>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-message" class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">
+            <span class="flash-text">{{ message }}</span>
+            <span class="flash-close" onclick="this.parentElement.remove()">✖</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<body>
+
+    <!-- SIDEBAR -->
+<div class="dashboard-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2 L2 7 L12 12 L22 7 Z" fill="#2d5016"/>
+                        <path d="M2 17 L12 22 L22 17" stroke="#2d5016" stroke-width="2"/>
+                        <path d="M2 12 L12 17 L22 12" stroke="#2d5016" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="sidebar-title">SOCIETE COOPERATIVE DES PRODUCTEURS AGRICOLES</div>
+                    <div class="sidebar-subtitle">Système de gestion coopérative</div>
+                </div>
+                <hr>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">PRINCIPAL</div>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="/dashboard" class="sidebar-nav-link">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/clients" class="sidebar-nav-link">
+                            <span class="sidebar-nav-icon">👥</span>
+                            <span>Clients</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/clients-statistiques" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📈</span>
+                            <span>Statistiques Clients</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/pisteurs" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">👤</span>
+                            <span>Pisteurs</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/pisteurs-statistiques" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📈</span>
+                            <span>Statistiques Pisteurs</span>
+                        </a>
+                    </li>
+                 </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">OPÉRATIONS</div>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="/zones" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📍</span>
+                            <span>Zones</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/products" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📦</span>
+                            <span>Produits</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/campagnes" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Campagnes</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/camions" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">🚚</span>
+                            <span>Camions</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/settings" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">⚙️</span>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+
+            <button type="button" class="header-left" onclick="retour()">← Retour</button>
+            
+            <div class="header-center">
+                <div class="search-bar">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Rechercher...">
+                </div>
+            </div>
+
+            <div class="profile">
+                👤 {{ user }}<br>
+                <small>{{ role }}</small>
+            </div>
+
+        </div>
+        <div class="export-buttons">
+            <a href="/fiche_clients/{{ nom_client }}/export/excel" class="excel-btn">
+                📊 Export Excel
+            </a>
+
+            <a href="/fiche_clients/{{ nom_client }}/export/pdf" class="pdf-btn">
+                📄 Export PDF
+            </a>
+        </div>
+        <!-- FORMULAIRE -->
+        <div class="card">
+            <h3>Ajouter une ligne</h3>
+
+            <form method="POST" action="/clients/fiche_clients/add" class="form">
+                <input name="client" value="{{ nom_client }}" placeholder="Réecrivez le nom SVP !" required>
+                <input name="montant" placeholder="Montant" required>
+                <input name="date" placeholder="Date" required>
+                <input name="date_dechargement" placeholder="Date dechargement" required>
+                <input name="numero_camion" placeholder="Numero camion" required>
+                <input name="numero_fiche" placeholder="Numero fiche" required>
+                <input name="poids_net" placeholder="Poids net" required>
+                <input name="prix" placeholder="Prix" required>
+                <input name="montant_livraison" placeholder="Montant Livraison" required>
+                <input name="resultat_livraison" placeholder="Resultat après livraison" required>
+                <input name="sac_reçu" placeholder="Sac reçu" required>
+                <input name="sac_livre" placeholder="Sac livre" required>
+                <input name="campagne" placeholder="Campagne" required>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+            <!-- TABLE -->
+            <div class="card">
+                <h3>fiche du client : {{ nom_client }}</h3>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Montant</th>
+                        <th>Cumul</th>
+                        <th>Date</th>
+                        <th>Date de dechargement</th>
+                        <th>Numero camion</th>
+                        <th>Numero fiche</th>
+                        <th>Poids net</th>
+                        <th>Cumul Poids Net</th>
+                        <th>Prix</th>
+                        <th>Montant livraison</th>
+                        <th>Cumul Montant livraison</th>
+                        <th>Resultat livraison</th>
+                        <th>Sac reçu</th>
+                        <th>Sac livre</th>
+                        <th>Sac restant</th>
+                        <th>Campagne</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for c in client_select %}
+                    <tr>
+                        <td>{{ c.montant }}</td>
+                        <td>{{ c.cumul }}</td>
+                        <td>{{ c.date }}</td>
+                        <td>{{ c.date_dechargement }}</td>
+                        <td>{{ c.numero_camion }}</td>
+                        <td>{{ c.numero_fiche }}</td>
+                        <td>{{ c.poids_net }}</td>
+                        <td>{{ c.cumul_poids_net }}</td>
+                        <td>{{ c.prix }}</td>
+                        <td>{{ c.montant_livraison }}</td>
+                        <td>{{ c.cumul_montant_livraison }}</td>
+                        <td>{{ c.resultat_livraison }}</td>
+                        <td>{{ c.sac_reçu }}</td>
+                        <td>{{ c.sac_livre }}</td>
+                        <td>{{ c.sac_restant }}</td>
+                        <td>{{ c.campagne }}</td>                        
+                        <td>
+                            <button class="edit-btn"><a href="/clients/edit_fiche/{{ c.id }}">✏️ Modifier</a></button>
+                        </td>
+                        <td>
+                            <form method="POST" action="/clients/delete_fiche/{{ c.id }}">
+                                <button type="submit" class="delete-btn"
+                                        onclick="return confirm('Supprimer cette colonne ?')">
+                                    🗑 Supprimer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+<script>
+function retour() {
+    window.location.href = "/clients";
+}
+</script>
+<script>
+    setTimeout(function() {
+        const flash = document.getElementById("flash-message");
+        if (flash) {
+            flash.style.transition = "all 0.5s ease";
+            flash.style.opacity = "0";
+            flash.style.transform = "translateY(-10px)";
+            setTimeout(() => flash.remove(), 500);
+        }
+    }, 1000);
+</script>
+</body>
+</html>

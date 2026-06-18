@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier fiche pisteur</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier fiche pisteur</h2>
+        <p class="subtitle">Modifiez les informations de la fiche</p>
+
+        <form method="POST" action="/pisteurs/update_fiche/{{ pisteur.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Date</label>
+                    <input name="date" value="{{ pisteur.date }}">
+                </div>
+                <div class="form-row">
+                    <label>Prix</label>
+                    <input name="prix" value="{{ pisteur.prix }}">
+                </div>
+                <div class="form-row">
+                    <label>Poids net</label>
+                    <input name="poids_net" value="{{ pisteur.poids_net }}">
+                </div>
+                <div class="form-row">
+                    <label>Debit</label>
+                    <input name="debit" value="{{ pisteur.debit }}">
+                </div>
+                <div class="form-row">
+                    <label>Credit</label>
+                    <input name="credit" value="{{ pisteur.credit }}">
+                </div>
+                <div class="form-row">
+                    <label>Sac reçu</label>
+                    <input name="sac_reçu" value="{{ pisteur.sac_reçu }}">
+                </div>
+                <div class="form-row">
+                    <label>Sac livre</label>
+                    <input name="sac_livre" value="{{ pisteur.sac_livre }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/pisteurs" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

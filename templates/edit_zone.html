@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier zone</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier zone</h2>
+        <p class="subtitle">Modifiez les informations de la zone</p>
+
+        <form method="POST" action="/zones/update/{{ zone.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Nom de la zone</label>
+                    <input name="nom" value="{{ zone.nom }}">
+                </div>
+
+                <div class="form-row">
+                    <label>Nombre de pisteurs</label>
+                    <input name="nombre_pisteur" value="{{ zone.nombre_pisteur }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/zones" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

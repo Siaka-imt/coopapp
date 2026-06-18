@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Acces refusé</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>Accès refusé</h2>
+        <p class="subtitle">Vous ne pouvez pas acceder à cette page !</p>
+
+        <button type="button" class="header-left" onclick="retour()">← Retour</button>
+
+    </div>
+
+</div>
+
+</body>
+<script>
+function retour() {
+    // retour à la page pisteur
+    window.location.href = "/settings";
+}
+</script>
+</html>

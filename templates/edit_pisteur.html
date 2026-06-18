@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier pisteur</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier pisteur</h2>
+        <p class="subtitle">Modifiez les informations du pisteur</p>
+
+        <form method="POST" action="/pisteurs/update/{{ pisteur.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Nom</label>
+                    <input name="nom" value="{{ pisteur.nom }}">
+                </div>
+
+                <div class="form-row">
+                    <label>Zone</label>
+                    <input name="zone" value="{{ pisteur.zone }}">
+                </div>
+                <div class="form-row">
+                    <label>Contact</label>
+                    <input name="contact" value="{{ pisteur.contact }}">
+                </div>
+                <div class="form-row">
+                    <label>Campagne</label>
+                    <input name="campagne" value="{{ pisteur.campagne }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/pisteurs" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

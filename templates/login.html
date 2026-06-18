@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 380px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #e2984a;
+      box-shadow: 0 0 5px rgba(230, 226, 148, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #e2984a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #e2984a;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-message" class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<body>
+
+  <div class="login-container">
+    <h2>Connexion</h2>
+
+    <form method="POST">
+      <div class="input-group">
+        <input name="email" type="email" placeholder="Adresse email" required>
+      </div>
+
+      <div class="input-group">
+        <input name="password" type="password" placeholder="Mot de passe" required>
+      </div>
+      
+      <button type="submit">Se connecter</button>
+    </form>
+
+    <div class="footer">
+      Accès sécurisé © Copawotko Cajou - Tous droits réservés
+    </div>
+    <a href="/forgot-password">
+      Mot de passe oublié ?
+    </a>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier fiche client</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier fiche client</h2>
+        <p class="subtitle">Modifiez les informations de la fiche</p>
+
+        <form method="POST" action="/clients/update_fiche/{{ client.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Date</label>
+                    <input name="date" value="{{ client.date }}">
+                </div>
+                <div class="form-row">
+                    <label>Date de dechargement</label>
+                    <input name="date_dechargement" value="{{ client.date_dechargement }}">
+                </div>
+                <div class="form-row">
+                    <label>Numero camion</label>
+                    <input name="numero_camion" value="{{ client.numero_camion }}">
+                </div>
+                <div class="form-row">
+                    <label>Numero fiche</label>
+                    <input name="numero_fiche" value="{{ client.numero_fiche }}">
+                </div>
+                <div class="form-row">
+                    <label>Poids net</label>
+                    <input name="poids_net" value="{{ client.poids_net }}">
+                </div>
+                <div class="form-row">
+                    <label>prix</label>
+                    <input name="prix" value="{{ client.prix }}">
+                </div>
+                <div class="form-row">
+                    <label>Montant de la livraison</label>
+                    <input name="montant_livraison" value="{{ client.montant_livraison }}">
+                </div>
+                <div class="form-row">
+                    <label>Resultat livraison</label>
+                    <input name="resultat_livraison" value="{{ client.resultat_livraison }}">
+                </div>
+                <div class="form-row">
+                    <label>Sac reçu</label>
+                    <input name="sac_reçu" value="{{ client.sac_reçu }}">
+                </div>
+                <div class="form-row">
+                    <label>Sac livre</label>
+                    <input name="sac_livre" value="{{ client.sac_livre }}">
+                </div>
+                <div class="form-row">
+                    <label>Campagne</label>
+                    <input name="campagne" value="{{ client.campagne }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/clients" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pisteur</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">>
+</head>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-message" class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">
+            <span class="flash-text">{{ message }}</span>
+            <span class="flash-close" onclick="this.parentElement.remove()">✖</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<body>
+
+    <!-- SIDEBAR -->
+<div class="dashboard-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2 L2 7 L12 12 L22 7 Z" fill="#2d5016"/>
+                        <path d="M2 17 L12 22 L22 17" stroke="#2d5016" stroke-width="2"/>
+                        <path d="M2 12 L12 17 L22 12" stroke="#2d5016" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="sidebar-title">SOCIETE COOPERATIVE DES PRODUCTEURS AGRICOLES</div>
+                    <div class="sidebar-subtitle">Système de gestion coopérative</div>
+                </div>
+                <hr>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">PRINCIPAL</div>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="/dashboard" class="sidebar-nav-link">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/clients" class="sidebar-nav-link">
+                            <span class="sidebar-nav-icon">👥</span>
+                            <span>Clients</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/clients-statistiques" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📈</span>
+                            <span>Statistiques Clients</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/pisteurs" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">👤</span>
+                            <span>Pisteurs</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/pisteurs-statistiques" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📈</span>
+                            <span>Statistiques Pisteurs</span>
+                        </a>
+                    </li>
+                 </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">OPÉRATIONS</div>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="/zones" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📍</span>
+                            <span>Zones</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/products" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📦</span>
+                            <span>Produits</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/campagnes" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Campagnes</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/camions" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">🚚</span>
+                            <span>Camions</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/settings" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">⚙️</span>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+
+            <button type="button" class="header-left" onclick="retour()">← Retour</button>
+
+            <div class="header-center">
+                <div class="search-bar">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Rechercher...">
+                </div>
+            </div>
+
+            <div class="profile">
+                👤 {{ user }}<br>
+                <small>{{ role }}</small>
+            </div>
+
+        </div>
+        <div class="export-buttons">
+            <a href="/fiche_pisteurs/{{ nom_pisteur }}/export/excel" class="excel-btn">
+                📊 Export Excel
+            </a>
+
+            <a href="/fiche_pisteurs/{{ nom_pisteur }}/export/pdf" class="pdf-btn">
+                📄 Export PDF
+            </a>
+        </div>
+        <!-- FORMULAIRE -->
+        <div class="card">
+            <h3>Ajouter une ligne</h3>
+
+            <form method="POST" action="/pisteurs/fiche_pisteurs/add" class="form">
+                <input name="pisteur" value="{{ nom_pisteur }}" placeholder="Réecrivez le nom SVP !" required>
+                <input name="date" placeholder="Date" required>
+                <input name="prix" placeholder="Prix" required>
+                <input name="poids_net" placeholder="Poids net" required>
+                <input name="debit" placeholder="Debit" required>
+                <input name="credit" placeholder="Cumul Credit" required>
+                <input name="sac_reçu" placeholder="Sac reçu" required>
+                <input name="sac_livre" placeholder="Sac livre" required>
+                <input name="detail" placeholder="Detail" required>
+                <input name="campagne" placeholder="Campagne" required>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+            <!-- TABLE -->
+            <div class="card">
+                <h3>fiche du pisteur : {{ nom_pisteur }}</h3>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Detail</th>
+                        <th>Prix</th>
+                        <th>Poids net</th>
+                        <th>Cumul Poids Net</th>
+                        <th>Debit</th>
+                        <th>Cumul debit</th>
+                        <th>Credit</th>
+                        <th>Cumul credit</th>
+                        <th>solde</th>
+                        <th>Sac reçu</th>
+                        <th>Sac livre</th>
+                        <th>Sac restant</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for c in pisteur_select %}
+                    <tr>
+                        <td>{{ c.date }}</td>
+                        <td>{{ c.detail }}</td>
+                        <td>{{ c.prix }}</td>
+                        <td>{{ c.poids_net }}</td>
+                        <td>{{ c.poids_cumul }}</td>
+                        <td>{{ c.debit }}</td>
+                        <td>{{ c.debit_cumul }}</td>
+                        <td>{{ c.credit}}</td>
+                        <td>{{ c.credit_cumul }}</td>
+                        <td>{{ c.solde }}</td>
+                        <td>{{ c.sac_reçu }}</td>
+                        <td>{{ c.sac_livre }}</td>
+                        <td>{{ c.sac_restant }}</td>
+                        <td>
+                            <button class="edit-btn"><a href="/pisteurs/edit_fiche/{{ c.id }}">✏️ Modifier</a></button>
+                        </td>
+                        <td>
+                            <form method="POST" action="/pisteurs/delete_fiche/{{ c.id }}">
+                                <button type="submit" class="delete-btn"
+                                        onclick="return confirm('Supprimer cette colonne ?')">
+                                    🗑 Supprimer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+<script>
+function retour() {
+    // retour à la page pisteur
+    window.location.href = "/pisteurs";
+}
+</script>
+<script>
+    setTimeout(function() {
+        const flash = document.getElementById("flash-message");
+        if (flash) {
+            flash.style.transition = "all 0.5s ease";
+            flash.style.opacity = "0";
+            flash.style.transform = "translateY(-10px)";
+            setTimeout(() => flash.remove(), 500);
+        }
+    }, 1000);
+</script>
+</body>
+</html>

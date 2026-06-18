@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-body">
+
+<div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2 L2 7 L12 12 L22 7 Z" fill="#2d5016"/>
+                        <path d="M2 17 L12 22 L22 17" stroke="#2d5016" stroke-width="2"/>
+                        <path d="M2 12 L12 17 L22 12" stroke="#2d5016" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="sidebar-title">SOCIETE COOPERATIVE DES PRODUCTEURS AGRICOLES</div>
+                    <div class="sidebar-subtitle">Système de gestion coopérative</div>
+                </div>
+                <hr>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">PRINCIPAL</div>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="/dashboard" class="sidebar-nav-link active">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/clients" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">👥</span>
+                            <span>Clients</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/clients-statistiques" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📈</span>
+                            <span>Statistiques Clients</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/pisteurs" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">👤</span>
+                            <span>Pisteurs</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/pisteurs-statistiques" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📈</span>
+                            <span>Statistiques Pisteurs</span>
+                        </a>
+                    </li>
+                 </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">OPÉRATIONS</div>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="/zones" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📍</span>
+                            <span>Zones</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/produits" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📦</span>
+                            <span>Produits</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/campagnes" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">📊</span>
+                            <span>Campagnes</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/camions" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">🚚</span>
+                            <span>Camions</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/settings" class="sidebar-nav-link ">
+                            <span class="sidebar-nav-icon">⚙️</span>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+
+            <div class="header-left">
+                <h1>Tableau de bord</h1>
+                <p>Vue d'ensemble de votre coopérative</p>
+            </div>
+
+            <div class="header-center">
+                <div class="search-bar">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Rechercher...">
+                </div>
+            </div>
+
+            <div class="profile">
+                👤 {{ user }}<br>
+                <small>{{ role }}</small>
+            </div>
+
+        </div>
+
+        <!-- CARDS -->
+        <div class="cards">
+
+            <a href="/clients" class="card">
+                <div class="card-icon">💼</div>
+                <h3>Clients</h3>
+                <p>{{ nb_clients }} clients enregistrés</p>
+            </a>
+
+            <a href="/pisteurs" class="card">
+                <div class="card-icon">🧭</div>
+                <h3>Pisteurs</h3>
+                <p>{{ nb_pisteurs }} pisteurs enregistrés</p>
+            </a>
+
+            <a href="/zones" class="card">
+                <div class="card-icon">🌍</div>
+                <h3>Zones</h3>
+                <p>{{ nb_zones }} zones enregistrées</p>
+            </a>
+
+            <a href="/camions" class="card">
+                <div class="card-icon">🚚</div>
+                <h3>Camions</h3>
+                <p>{{ nb_camions }} camions enregistrés</p>
+            </a>
+            <a href="/produits" class="card">
+                <div class="card-icon">📦</div>
+                <h3>Produits</h3>
+                <p>{{ nb_produits }} produits enregistrés</p>
+            </a>
+            <a href="/campagnes" class="card">
+                <div class="card-icon">📊</div>
+                <h3>Campagnes</h3>
+                <p>{{ nb_campagnes }} campagnes enregistrées</p>
+            </a>
+
+        </div>
+        <!-- CHARTS -->
+        <div class="charts">
+
+            <div class="chart-card">
+                <h3>Répartition des données</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h3>Activité</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+
+        </div>
+
+        
+
+    </main>
+
+</div>
+    <script>
+            // Pie Chart
+            const pieCtx = document.getElementById('pieChart');
+
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: { labels: ['Clients', 'Pisteurs', 'Zones', 'Camions'],
+                        datasets: [{data: [{{ nb_clients }}, {{ nb_pisteurs }}, {{ nb_zones }}, {{ nb_camions }}] }]}
+                });
+
+            // Bar Chart
+            const barCtx = document.getElementById('barChart');
+
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Clients', 'Pisteurs', 'Zones', 'Camions'],
+                    datasets: [{label: 'Nombre',
+                            data: [{{ nb_clients }}, {{ nb_pisteurs }}, {{ nb_zones }}, {{ nb_camions }}]
+                        }]
+                    }
+                });
+        </script>
+</body>
+</html>

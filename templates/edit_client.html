@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier client</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier client</h2>
+        <p class="subtitle">Modifiez les informations du client</p>
+
+        <form method="POST" action="/clients/update/{{ client.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Nom</label>
+                    <input name="nom" value="{{ client.nom }}">
+                </div>
+                <div class="form-row">
+                    <label>Contact</label>
+                    <input name="contact" value="{{ client.contact }}">
+                </div>
+                <div class="form-row">
+                    <label>Localisation</label>
+                    <input name="localisation" value="{{ client.localisation }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/clients" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

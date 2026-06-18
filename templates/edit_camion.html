@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier camion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier camion</h2>
+        <p class="subtitle">Modifiez les informations du camion</p>
+
+        <form method="POST" action="/camions/update/{{ camion.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Numéro</label>
+                    <input name="numero" value="{{ camion.numero }}">
+                </div>
+                <div class="form-row">
+                    <label>Date de départ</label>
+                    <input name="date_depart" value="{{ camion.date_depart }}">
+                </div>
+                <div class="form-row">
+                    <label>Date de retour</label>
+                    <input name="date_retour" value="{{ camion.date_retour }}">
+                </div>
+                <div class="form-row">
+                    <label>Destination</label>
+                    <input name="destination" value="{{ camion.destination }}">
+                </div>
+                <div class="form-row">
+                    <label>Usager</label>
+                    <input name="usager" value="{{ camion.usager }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/camions" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
