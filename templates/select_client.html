@@ -118,7 +118,7 @@
         <!-- TOPBAR -->
         <div class="topbar">
 
-            <button type="button" class="header-left" onclick="retour()">← Retour</button>
+            <button type="button" class="header-left back-btn" onclick="retour()">← Retour</button>
             
             <div class="header-center">
                 <div class="search-bar">
@@ -156,7 +156,6 @@
                 <input name="poids_net" placeholder="Poids net" required>
                 <input name="prix" placeholder="Prix" required>
                 <input name="montant_livraison" placeholder="Montant Livraison" required>
-                <input name="resultat_livraison" placeholder="Resultat après livraison" required>
                 <input name="sac_reçu" placeholder="Sac reçu" required>
                 <input name="sac_livre" placeholder="Sac livre" required>
                 <input name="campagne" placeholder="Campagne" required>
@@ -193,21 +192,21 @@
                 <tbody>
                     {% for c in client_select %}
                     <tr>
-                        <td>{{ c.montant }}</td>
-                        <td>{{ c.cumul }}</td>
+                        <td>{{ format_number_after(format_number(c.montant)) }}</td>
+                        <td>{{ format_number_after(format_number(c.cumul)) }}</td>
                         <td>{{ c.date }}</td>
                         <td>{{ c.date_dechargement }}</td>
                         <td>{{ c.numero_camion }}</td>
                         <td>{{ c.numero_fiche }}</td>
-                        <td>{{ c.poids_net }}</td>
-                        <td>{{ c.cumul_poids_net }}</td>
-                        <td>{{ c.prix }}</td>
-                        <td>{{ c.montant_livraison }}</td>
-                        <td>{{ c.cumul_montant_livraison }}</td>
-                        <td>{{ c.resultat_livraison }}</td>
-                        <td>{{ c.sac_reçu }}</td>
-                        <td>{{ c.sac_livre }}</td>
-                        <td>{{ c.sac_restant }}</td>
+                        <td>{{ format_number_after(format_number(c.poids_net)) }}</td>
+                        <td>{{ format_number_after(format_number(c.cumul_poids_net)) }}</td>
+                        <td>{{ format_number_after(format_number(c.prix)) }}</td>
+                        <td>{{ format_number_after(format_number(c.montant_livraison)) }}</td>
+                        <td>{{ format_number_after(format_number(c.cumul_montant_livraison)) }}</td>
+                        <td>{{ format_number_after(format_number(c.resultat_livraison)) }}</td>
+                        <td>{{ format_number_after(format_number(c.sac_reçu)) }}</td>
+                        <td>{{ format_number_after(format_number(c.sac_livre)) }}</td>
+                        <td>{{ format_number_after(format_number(c.sac_restant)) }}</td>
                         <td>{{ c.campagne }}</td>                        
                         <td>
                             <button class="edit-btn"><a href="/clients/edit_fiche/{{ c.id }}">✏️ Modifier</a></button>

@@ -118,7 +118,7 @@
         <!-- TOPBAR -->
         <div class="topbar">
 
-            <button type="button" class="header-left" onclick="retour()">← Retour</button>
+            <button type="button" class="header-left back-btn" onclick="retour()">← Retour</button>
 
             <div class="header-center">
                 <div class="search-bar">
@@ -180,6 +180,7 @@
                         <th>Sac reçu</th>
                         <th>Sac livre</th>
                         <th>Sac restant</th>
+                        <th>Campagne</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -189,17 +190,18 @@
                     <tr>
                         <td>{{ c.date }}</td>
                         <td>{{ c.detail }}</td>
-                        <td>{{ c.prix }}</td>
-                        <td>{{ c.poids_net }}</td>
-                        <td>{{ c.poids_cumul }}</td>
-                        <td>{{ c.debit }}</td>
-                        <td>{{ c.debit_cumul }}</td>
-                        <td>{{ c.credit}}</td>
-                        <td>{{ c.credit_cumul }}</td>
-                        <td>{{ c.solde }}</td>
-                        <td>{{ c.sac_reçu }}</td>
-                        <td>{{ c.sac_livre }}</td>
-                        <td>{{ c.sac_restant }}</td>
+                        <td>{{ format_number_after(format_number(c.prix)) }}</td>
+                        <td>{{ format_number_after(format_number(c.poids_net)) }}</td>
+                        <td>{{ format_number_after(format_number(c.poids_cumul)) }}</td>
+                        <td>{{ format_number_after(format_number(c.debit)) }}</td>
+                        <td>{{ format_number_after(format_number(c.debit_cumul)) }}</td>
+                        <td>{{ format_number_after(format_number(c.credit)) }}</td>
+                        <td>{{ format_number_after(format_number(c.credit_cumul)) }}</td>
+                        <td>{{ format_number_after(format_number(c.solde)) }}</td>
+                        <td>{{ format_number_after(format_number(c.sac_reçu)) }}</td>
+                        <td>{{ format_number_after(format_number(c.sac_livre)) }}</td>
+                        <td>{{ format_number_after(format_number(c.sac_restant)) }}</td>
+                        <td>{{ c.campagne }}</td>
                         <td>
                             <button class="edit-btn"><a href="/pisteurs/edit_fiche/{{ c.id }}">✏️ Modifier</a></button>
                         </td>

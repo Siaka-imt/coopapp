@@ -11,31 +11,38 @@ from datetime import datetime
 from reportlab.lib.pagesizes import letter, landscape
 import secrets
 from datetime import datetime, timedelta
+from mail import send_reset_email
+from config import Config
 
 app = Flask(__name__)
-app.secret_key = "secret_key_siaka"
+app.secret_key = Config.SECRET_KEY
 
 #       Charger config.json
 with open("config.json") as f:
     config = json.load(f)
 
+DB_HOST = Config.DB_HOST
+DB_NAME = Config.DB_NAME
+DB_USER = Config.DB_USER
+DB_PASSWORD = Config.DB_PASSWORD
 #       Connexion DB
 def get_db_connection():
     return mysql.connector.connect(
-        host=config["host"],
-        user=config["user"],
-        password=config["password"],
-        database=config["database"]
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME
     )
 #       charger logo
 import os
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'svg'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -52,6 +59,12 @@ def clean_number(value):
         return 0
     
     return int(value.replace(" ", ""))
+def format_number_after(value):
+        if value is None or str(value).strip() == "":
+            return ""
+        if value == 'None':
+            return ""
+        return "{:,}".format(int(str(value).replace(" ", ""))).replace(",", " ")
 
 def recalculate_fiche_pisteur(pisteur, campagne):
     conn = get_db_connection()
@@ -263,12 +276,7 @@ def forgot_password():
             _external=True
         )
 
-        print(reset_link)  # temporaire pour les tests
-
-        flash(
-            "Un lien de réinitialisation a été généré.",
-            "success"
-        )
+        send_reset_email(email, reset_link)
 
         return redirect("/")
 
@@ -443,7 +451,7 @@ def select_client(nom):
     client = cursor.fetchall()
 
     return render_template("select_client.html",nom_client = nom, client_select = client, user = session["user"],
-        role = session["role"])
+        role = session["role"],format_number=clean_number,format_number_after=format_number_after)
 @app.route("/clientS/<nom>")
 def voir_client(nom):
     conn = get_db_connection()
@@ -457,7 +465,9 @@ def voir_client(nom):
         nom_client = nom,
         client_select = client,
         user = session["user"],
-        role = session["role"]
+        role = session["role"],
+        format_number = clean_number,
+        format_number_after = format_number_after
     )
 @app.route("/clients/delete_fiche/<int:id>", methods = ["POST"])
 def delete_client_fiche(id):
@@ -503,7 +513,6 @@ def update_fiche_client(id):
     poids_net = request.form["poids_net"]
     prix = request.form["prix"]
     montant_livraison = request.form["montant_livraison"]
-    resultat_livraison = request.form["resultat_livraison"]
     sac_reçu = request.form["sac_reçu"]
     sac_livre = request.form["sac_livre"]
     campagne = request.form["campagne"]
@@ -523,12 +532,11 @@ def update_fiche_client(id):
         UPDATE fiche_client 
         SET date = %s, date_dechargement = %s, numero_camion = %s, numero_fiche = %s,
                    poids_net = %s, prix = %s, montant_livraison = %s, 
-                   resultat_livraison = %s, sac_reçu = %s, sac_livre = %s,
+                   sac_reçu = %s, sac_livre = %s,
                    montant = %s, campagne = %s
         WHERE id = %s
     """, (date, date_dechargement, numero_camion, numero_fiche, poids_net,
-           prix, montant_livraison, resultat_livraison, sac_reçu, sac_livre,
-            montant, campagne, id))
+           prix, montant_livraison, sac_reçu, sac_livre, montant, campagne, id))
 
     conn.commit()
     recalculate_fiche_client(client_nom, campagne)
@@ -545,7 +553,6 @@ def add_fiche_client():
     poids_net = request.form["poids_net"]
     prix = request.form["prix"]
     montant_livraison = request.form["montant_livraison"]
-    resultat_livraison = request.form["resultat_livraison"]
     sac_reçu = request.form["sac_reçu"]
     sac_livre = request.form["sac_livre"]
     campagne = request.form["campagne"]
@@ -556,8 +563,8 @@ def add_fiche_client():
     # 🔥 dernière ligne du pisteur pour cette campagne
     cursor.execute("""
         SELECT *
-        FROM fiche_pisteur
-        WHERE pisteur = %s AND campagne = %s
+        FROM fiche_client
+        WHERE client = %s AND campagne = %s
         ORDER BY id DESC
         LIMIT 1
     """, (nom, campagne))
@@ -586,6 +593,8 @@ def add_fiche_client():
     cumul_montant_livraison = clean_number(last_montant_livraison) + clean_number(montant_livraison)
 
     sac_restant = clean_number(last_sac) + clean_number(sac_reçu) - clean_number(sac_livre)
+
+    resultat_livraison = cumul - cumul_montant_livraison
 
     cursor.execute("""
         INSERT INTO fiche_client (client, cumul, date, date_dechargement, numero_camion, numero_fiche,
@@ -902,7 +911,7 @@ def select_pisteur(nom):
     pisteur = cursor.fetchall()
 
     return render_template("select_pisteur.html",nom_pisteur = nom, pisteur_select=pisteur, user=session["user"],
-        role=session["role"])
+        role=session["role"],format_number=clean_number, format_number_after=format_number_after)
 @app.route("/pisteurs/<nom>")
 def voir_pisteur(nom):
     conn = get_db_connection()
@@ -916,7 +925,9 @@ def voir_pisteur(nom):
         nom_pisteur=nom,
         pisteur_select=pisteur,
         user=session["user"],
-        role=session["role"]
+        role=session["role"],
+        format_number=clean_number,
+        format_number_after=format_number_after
     )
 @app.route("/pisteurs/delete_fiche/<int:id>", methods = ["POST"])
 def delete_pisteur_fiche(id):
@@ -2112,7 +2123,11 @@ def clients_statistiques():
             return 0
         return int(str(value).replace(" ", ""))
     def format_number(value):
-        return "{:,}".format(int(value)).replace(",", " ")
+        if value is None or str(value).strip() == "":
+            return ""
+        if value == 'None':
+            return ""
+        return "{:,}".format(int(str(value).replace(" ", ""))).replace(",", " ")
     for row in data:
         totals["cumul"] += clean_number(row["cumul"]) or 0
         totals["poids"] += clean_number(row["cumul_poids_net"]) or 0
@@ -2177,7 +2192,11 @@ def pisteurs_statistiques():
         "sac": 0
     }
     def format_number(value):
-        return "{:,}".format(int(value)).replace(",", " ")
+        if value is None or str(value).strip() == "":
+            return ""
+        if value == 'None':
+            return ""
+        return "{:,}".format(int(str(value).replace(" ", ""))).replace(",", " ")
     for row in data:
         totals["poids"] += clean_number(row["poids_cumul"]) or 0
         totals["debit"] += clean_number(row["debit_cumul"]) or 0

@@ -165,15 +165,19 @@
                 <h3>Filtrer par campagne</h3>
 
                 <form method="GET" action="/clients-statistiques" class="filter-form">
-                    <select name="campagne" onchange="this.form.submit()">
+                    <label for="campagne">Campagne :</label>
+
+                    <select name="campagne" id="campagne" onchange="this.form.submit()">
+                        <option value="">-- Toutes les campagnes --</option>
+
                         {% for c in campagnes %}
                             <option value="{{ c.campagne }}"
                                 {% if campagne_selected == c.campagne %}selected{% endif %}>
                                 {{ c.campagne }}
                             </option>
-                            <option value="">-- Toutes les campagnes --</option>
                         {% endfor %}
                     </select>
+
                     <button type="submit">Filtrer</button>
                 </form>
             </div>
@@ -197,11 +201,11 @@
                         <tr>
                             <td>{{ row.client }}</td>
                             <td>{{ row.campagne }}</td>
-                            <td>{{ row.cumul }}</td>
-                            <td>{{ row.cumul_poids_net }}</td>
-                            <td>{{ row.cumul_montant_livraison }}</td>
-                            <td>{{ row.resultat_livraison }}</td>
-                            <td>{{ row.sac_restant }}</td>
+                            <td>{{ format_number(row.cumul) }}</td>
+                            <td>{{ format_number(row.cumul_poids_net) }}</td>
+                            <td>{{ format_number(row.cumul_montant_livraison) }}</td>
+                            <td>{{ format_number(row.resultat_livraison) }}</td>
+                            <td>{{ format_number(row.sac_restant) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

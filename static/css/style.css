@@ -148,6 +148,7 @@ body {
 }
 /* CHARTS */
 .charts {
+    width:350px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
@@ -155,6 +156,7 @@ body {
 }
 
 .chart-card {
+    width:350px;
     background: white;
     padding: 20px;
     border-radius: 15px;
@@ -253,6 +255,14 @@ body {
 }
 .select-btn {
     background: #47ace2;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.back-btn {
+    background: hsl(54, 89%, 57%);
     color: white;
     border: none;
     padding: 8px 12px;

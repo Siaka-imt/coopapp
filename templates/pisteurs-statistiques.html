@@ -164,15 +164,19 @@
                 <h3>Filtrer par campagne</h3>
 
                 <form method="GET" action="/pisteurs-statistiques" class="filter-form">
-                    <select name="campagne" onchange="this.form.submit()">
+                    <label for="campagne">Campagne :</label>
+
+                    <select name="campagne" id="campagne" onchange="this.form.submit()">
+                        <option value="">-- Toutes les campagnes --</option>
+
                         {% for c in campagnes %}
                             <option value="{{ c.campagne }}"
                                 {% if campagne_selected == c.campagne %}selected{% endif %}>
                                 {{ c.campagne }}
                             </option>
-                            <!-- <option value="">-- Toutes les campagnes --</option> -->
                         {% endfor %}
                     </select>
+
                     <button type="submit">Filtrer</button>
                 </form>
             </div>
@@ -196,11 +200,11 @@
                         <tr>
                             <td>{{ row.pisteur }}</td>
                             <td>{{ row.campagne }}</td>
-                            <td>{{ row.poids_cumul }}</td>
-                            <td>{{ row.debit_cumul }}</td>
-                            <td>{{ row.credit_cumul }}</td>
-                            <td>{{ row.solde }}</td>
-                            <td>{{ row.sac_restant }}</td>
+                            <td>{{ format_number(row.poids_cumul) }}</td>
+                            <td>{{ format_number(row.debit_cumul) }}</td>
+                            <td>{{ format_number(row.credit_cumul) }}</td>
+                            <td>{{ format_number(row.solde) }}</td>
+                            <td>{{ format_number(row.sac_restant) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
