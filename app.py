@@ -58,7 +58,7 @@ def clean_number(value):
     if value == None or value == "None":
         return 0
     
-    return int(value.replace(" ", ""))
+    return int(float(str(value).replace(" ", "")))
 def format_number_after(value):
         if value is None or str(value).strip() == "":
             return ""
