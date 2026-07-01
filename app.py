@@ -365,6 +365,44 @@ def dashboard():
     cursor.execute("SELECT COUNT(*) FROM produit")
     nb_produits = cursor.fetchone()[0]
 
+    # ======================================
+    # Répartition des pisteurs par zone
+    # ======================================
+
+    cursor.execute("""
+        SELECT nom, nombre_pisteur
+        FROM zone
+        ORDER BY nombre_pisteur DESC
+    """)
+
+    pisteurs_zone = cursor.fetchall()
+
+    zones_labels = [row[0] for row in pisteurs_zone]
+    zones_values = [row[1] for row in pisteurs_zone]
+    print(zones_labels)
+    print(zones_values)
+
+    # ======================================
+    # Répartition des clients par ville
+    # ======================================
+
+    cursor.execute("""
+        SELECT localisation, COUNT(*)
+        FROM client
+        GROUP BY localisation
+        ORDER BY COUNT(*) DESC
+    """)
+
+    clients_ville = cursor.fetchall()
+
+    villes_labels = [row[0] for row in clients_ville]
+    villes_values = [row[1] for row in clients_ville]
+    
+    print(villes_labels)
+    print(villes_values)
+
+    cursor.close()
+    conn.close()
     return render_template(
         "dashboard.html",
         user=session["user"],
@@ -374,7 +412,13 @@ def dashboard():
         nb_zones=nb_zones,
         nb_camions=nb_camions,
         nb_campagnes=nb_campagnes,
-        nb_produits=nb_produits
+        nb_produits=nb_produits,
+
+        zones_labels=zones_labels,
+        zones_values=zones_values,
+
+        villes_labels=villes_labels,
+        villes_values=villes_values
     )
 #----------------------------------------------------------------
 # Routes clients

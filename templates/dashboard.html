@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="dashboard-body">
+<body>
 
 <div class="dashboard-layout">
         <!-- Sidebar -->
@@ -173,13 +173,21 @@
             </div>
 
             <div class="chart-card">
-                <h3>Activité</h3>
+                <h3>Activité de l'application</h3>
                 <canvas id="barChart"></canvas>
             </div>
 
-        </div>
+            <div class="chart-card">
+                <h3>Répartition des pisteurs par zone</h3>
+                <canvas id="chartPisteursZone"></canvas>
+            </div>
 
-        
+            <div class="chart-card">
+                <h3>Répartition des clients par ville</h3>
+                <canvas id="chartClientsVille"></canvas>
+            </div>
+
+        </div>
 
     </main>
 
@@ -206,6 +214,45 @@
                         }]
                     }
                 });
+            // Données provenant de Flask
+            const zones_labels = {{ zones_labels | tojson }};
+            const zones_values = {{ zones_values | tojson }};
+
+            const villes_labels = {{ villes_labels | tojson }};
+            const villes_values = {{ villes_values | tojson }};
+            // Repartition des pisteurs par zone
+            new Chart(document.getElementById("chartPisteursZone"), {
+                type: 'bar',
+                data: {
+                    labels: zones_labels,
+                    datasets: [{
+                        label: "Nombre de pisteurs",
+                        data: zones_values,
+                        backgroundColor: "#4CAF50"
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true
+                }
+            });
+            
+            // Repartition des clients par ville
+            new Chart(document.getElementById("chartClientsVille"), {
+                type: 'bar',
+                data: {
+                    labels: villes_labels,
+                    datasets: [{
+                        label: "Nombre de clients",
+                        data: villes_values,
+                        backgroundColor: "#8E44AD"
+                    }]
+                },
+                options: {
+                    indexAxis : 'y',
+                    responsive: true
+                }
+            });
         </script>
 </body>
 </html>

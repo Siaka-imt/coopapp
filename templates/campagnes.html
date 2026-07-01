@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">>
 </head>
 
+<body>
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div id="flash-message" class="flash-container">
@@ -19,9 +20,6 @@
     </div>
   {% endif %}
 {% endwith %}
-
-<body>
-
 <!-- SIDEBAR -->
 <div class="dashboard-layout">
         

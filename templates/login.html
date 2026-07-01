@@ -74,6 +74,8 @@
     }
   </style>
 </head>
+
+<body>
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div id="flash-message" class="flash-container">
@@ -85,8 +87,6 @@
     </div>
   {% endif %}
 {% endwith %}
-<body>
-
   <div class="login-container">
     <h2>Connexion</h2>
 
