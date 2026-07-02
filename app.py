@@ -379,8 +379,6 @@ def dashboard():
 
     zones_labels = [row[0] for row in pisteurs_zone]
     zones_values = [row[1] for row in pisteurs_zone]
-    print(zones_labels)
-    print(zones_values)
 
     # ======================================
     # Répartition des clients par ville
@@ -397,10 +395,31 @@ def dashboard():
 
     villes_labels = [row[0] for row in clients_ville]
     villes_values = [row[1] for row in clients_ville]
-    
-    print(villes_labels)
-    print(villes_values)
 
+    # =============================================
+    # comparaison des performances entre campagnes
+    # =============================================
+
+    cursor.execute("""
+        SELECT
+            campagne,
+            SUM(CAST(REPLACE(cumul,' ','') AS UNSIGNED)) AS total_cumul
+        FROM fiche_client
+        WHERE id IN (
+            SELECT MAX(id)
+            FROM fiche_client
+            GROUP BY client, campagne
+        )
+        GROUP BY campagne
+        ORDER BY campagne
+        """)
+
+    campagnes_data = cursor.fetchall()
+
+    campagnes_labels = [row[0] for row in campagnes_data]
+    campagnes_values = [int(row[1]) for row in campagnes_data]
+    print(campagnes_labels)
+    print(campagnes_values)
     cursor.close()
     conn.close()
     return render_template(
@@ -418,7 +437,10 @@ def dashboard():
         zones_values=zones_values,
 
         villes_labels=villes_labels,
-        villes_values=villes_values
+        villes_values=villes_values,
+
+        campagnes_labels=campagnes_labels,
+        campagnes_values=campagnes_values
     )
 #----------------------------------------------------------------
 # Routes clients
@@ -2181,12 +2203,12 @@ def clients_statistiques():
 
     return render_template(
         "clients-statistiques.html",
-        data=data,
-        totals=totals,
-        format_number=format_number,
-        campagnes=campagnes,
-        user=session["user"],
-        role=session["role"]
+        data = data,
+        totals = totals,
+        format_number = format_number,
+        campagnes = campagnes,
+        user = session["user"],
+        role = session["role"]
     )
 #----------------------------------------------------------------
 # Routes pisteurs statistiques
@@ -2250,12 +2272,12 @@ def pisteurs_statistiques():
 
     return render_template(
         "pisteurs-statistiques.html",
-        data=data,
-        totals=totals,
-        format_number=format_number,
-        campagnes=campagnes,
-        user=session["user"],
-        role=session["role"]
+        data = data,
+        totals = totals,
+        format_number = format_number,
+        campagnes = campagnes,
+        user = session["user"],
+        role = session["role"]
     )
 #----------------------------------------------------------------
 # Routes utilisateurs

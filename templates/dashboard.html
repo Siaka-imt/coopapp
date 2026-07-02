@@ -173,8 +173,8 @@
             </div>
 
             <div class="chart-card">
-                <h3>Activité de l'application</h3>
-                <canvas id="barChart"></canvas>
+                <h3>Cumul total par campagne </h3>
+                <canvas id="chartCampagnes"></canvas>
             </div>
 
             <div class="chart-card">
@@ -202,18 +202,29 @@
                         datasets: [{data: [{{ nb_clients }}, {{ nb_pisteurs }}, {{ nb_zones }}, {{ nb_camions }}] }]}
                 });
 
-            // Bar Chart
-            const barCtx = document.getElementById('barChart');
+            // Cumul total par campagne
+            const campagnes_labels = {{ campagnes_labels|tojson }};
+            const campagnes_values = {{ campagnes_values|tojson }};
 
-            new Chart(barCtx, {
-                type: 'bar',
+            new Chart(document.getElementById("chartCampagnes"), {
+                type: "bar",
                 data: {
-                    labels: ['Clients', 'Pisteurs', 'Zones', 'Camions'],
-                    datasets: [{label: 'Nombre',
-                            data: [{{ nb_clients }}, {{ nb_pisteurs }}, {{ nb_zones }}, {{ nb_camions }}]
-                        }]
+                    labels: campagnes_labels,
+                    datasets: [{
+                        label: "Cumul des achats (kg)",
+                        data: campagnes_values,
+                        backgroundColor: "#FF9800"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                     }
-                });
+                }
+            });
             // Données provenant de Flask
             const zones_labels = {{ zones_labels | tojson }};
             const zones_values = {{ zones_values | tojson }};
