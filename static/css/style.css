@@ -177,8 +177,8 @@ body{
 
 /* Canvas */
 .chart-card canvas{
-    width:100% ;
-    height:250px ;
+    width:100% !important;
+    height:250px !important;
 }
 /* CHARTS *
 .charts {
