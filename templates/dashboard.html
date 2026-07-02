@@ -197,10 +197,16 @@
             const pieCtx = document.getElementById('pieChart');
 
             new Chart(pieCtx, {
-                type: 'pie',
-                data: { labels: ['Clients', 'Pisteurs', 'Zones', 'Camions'],
-                        datasets: [{data: [{{ nb_clients }}, {{ nb_pisteurs }}, {{ nb_zones }}, {{ nb_camions }}] }]}
-                });
+                type : 'pie',
+                data : { labels: ['Clients', 'Pisteurs', 'Zones', 'Camions'],
+                        datasets: [{data: [{{ nb_clients }}, {{ nb_pisteurs }}, {{ nb_zones }}, {{ nb_camions }}] }]
+                    },
+                
+                options:{
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
 
             // Cumul total par campagne
             const campagnes_labels = {{ campagnes_labels|tojson }};
@@ -218,6 +224,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: false
@@ -244,7 +251,8 @@
                 },
                 options: {
                     indexAxis: 'y',
-                    responsive: true
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
             
@@ -261,7 +269,8 @@
                 },
                 options: {
                     indexAxis : 'y',
-                    responsive: true
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
         </script>

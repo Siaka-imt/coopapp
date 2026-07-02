@@ -153,7 +153,34 @@ body{
 .card p {
     color: #6b7280;
 }
-/* CHARTS */
+/* Zone des graphiques */
+.charts{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:20px;
+    margin-top:20px;
+}
+
+/* Carte graphique */
+.chart-card{
+    background:#fff;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    padding:15px;
+    height:330px;      /* hauteur fixe */
+}
+
+.chart-card h3{
+    margin:0 0 10px;
+    font-size:20px;
+}
+
+/* Canvas */
+.chart-card canvas{
+    width:100% ;
+    height:250px ;
+}
+/* CHARTS *
 .charts {
     display: grid;
     grid-template-columns: repeat(2, minmax(450px, 1fr));
@@ -172,7 +199,7 @@ body{
 .chart-card canvas {
     width: 100% ;
     height: 300px ;
-}
+}*/
 .sidebar-header {
     display: flex;
     align-items: center;
