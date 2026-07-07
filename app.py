@@ -37,12 +37,15 @@ def get_db_connection():
 import os
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
+UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads","logos")
+PROFILE_UPLOAD_FOLDER = "static/uploads/profiles"
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'svg'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config["PROFILE_UPLOAD_FOLDER"] = PROFILE_UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROFILE_UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -346,6 +349,8 @@ def dashboard():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     # Comptage des données
     cursor.execute("SELECT COUNT(*) FROM client")
     nb_clients = cursor.fetchone()[0]
@@ -426,6 +431,7 @@ def dashboard():
         "dashboard.html",
         user=session["user"],
         role=session["role"],
+        photo = user_photo[0],
         nb_clients=nb_clients,
         nb_pisteurs=nb_pisteurs,
         nb_zones=nb_zones,
@@ -447,14 +453,31 @@ def dashboard():
 #----------------------------------------------------------------
 @app.route("/clients")
 def clients():
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary = True)
 
-    cursor.execute("SELECT * FROM client")
-    data = cursor.fetchall()
-
-    return render_template("clients.html",clients = data,user = session["user"],
-        role = session["role"])
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM client
+            WHERE nom LIKE %s
+            ORDER BY nom
+        """, (f"%{search}%",))
+    else:
+        cursor.execute("""
+            SELECT *
+            FROM client
+            ORDER BY nom
+        """)
+    clients = cursor.fetchall()
+    cursor.execute("SELECT photo FROM utilisateur WHERE username = %s", (session["user"],))
+    user_photo = cursor.fetchone()
+    return render_template("clients.html",clients = clients,user = session["user"],
+        role = session["role"], photo = user_photo["photo"] if user_photo else None)
 @app.route("/clients/add", methods = ["POST"])
 def add_client():
     nom = request.form["nom"]
@@ -510,14 +533,29 @@ def update_client(id):
     return redirect("/clients")
 @app.route("/clients/select/<string:nom>", methods = ["GET"])
 def select_client(nom):
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM fiche_client WHERE client = %s", (nom,))
-    client = cursor.fetchall()
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM fiche_client
+            WHERE date LIKE %s and client = %s
+            ORDER BY date DESC
+        """, (f"%{search}%", nom))
+    else:
+        cursor.execute("SELECT * FROM fiche_client WHERE client = %s", (nom,))
 
+    #cursor.execute("SELECT * FROM fiche_client WHERE client = %s", (nom,))
+    client = cursor.fetchall()
+    cursor.execute("SELECT photo FROM utilisateur WHERE username = %s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template("select_client.html",nom_client = nom, client_select = client, user = session["user"],
-        role = session["role"],format_number=clean_number,format_number_after=format_number_after)
+        role = session["role"],format_number=clean_number,format_number_after=format_number_after, photo=user_photo["photo"] if user_photo else None)
 @app.route("/clientS/<nom>")
 def voir_client(nom):
     conn = get_db_connection()
@@ -906,13 +944,20 @@ def export_fiche_clients_pdf(nom):
 #-------------------------------------------------------------------------------------------
 @app.route("/pisteurs")
 def pisteurs():
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM pisteur")
+    if search:
+        cursor.execute("SELECT * FROM pisteur WHERE nom LIKE %s", (f"%{search}%",))
+    else:
+        cursor.execute("SELECT * FROM pisteur")
     data = cursor.fetchall()
-
-    return render_template("pisteurs.html", pisteurs=data, user=session["user"],role=session["role"])
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
+    return render_template("pisteurs.html", pisteurs=data, user=session["user"],role=session["role"],photo=user_photo["photo"] if user_photo else None)
 @app.route("/pisteurs/add", methods=["POST"])
 def add_pisteur():
     nom = request.form["nom"]
@@ -970,14 +1015,21 @@ def update_pisteur(id):
     return redirect("/pisteurs")
 @app.route("/pisteurs/select/<string:nom>", methods=["GET"])
 def select_pisteur(nom):
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM fiche_pisteur WHERE pisteur = %s", (nom,))
+    if search:
+        cursor.execute("SELECT * FROM fiche_pisteur WHERE date LIKE %s and pisteur = %s", (f"%{search}%", nom))
+    else:
+        cursor.execute("SELECT * FROM fiche_pisteur WHERE pisteur = %s", (nom,))
     pisteur = cursor.fetchall()
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username = %s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template("select_pisteur.html",nom_pisteur = nom, pisteur_select=pisteur, user=session["user"],
-        role=session["role"],format_number=clean_number, format_number_after=format_number_after)
+        role=session["role"],format_number=clean_number, format_number_after=format_number_after,photo = user_photo["photo"] if user_photo else None)
 @app.route("/pisteurs/<nom>")
 def voir_pisteur(nom):
     conn = get_db_connection()
@@ -1374,14 +1426,25 @@ def export_fiche_pisteurs_pdf(nom):
 #----------------------------------------------------------------
 @app.route("/camions")
 def camions():
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM camion")
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM camion
+            WHERE numero LIKE %s
+            ORDER BY numero
+        """, (f"%{search}%",))
+    else:
+        cursor.execute("SELECT * FROM camion")
     data = cursor.fetchall()
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template("camions.html", camions=data, user=session["user"],
-        role=session["role"])
+        role=session["role"], photo=user_photo["photo"] if user_photo else None)
 @app.route("/camions/add", methods=["POST"])
 def add_camion():
     numero = request.form["numero"]
@@ -1557,14 +1620,30 @@ def export_camions_pdf():
 #------------------------------------------------------------------------
 @app.route("/zones")
 def zones():
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM zone
+            WHERE nom LIKE %s
+            ORDER BY nom
+        """, (f"%{search}%",))
+    else:
+        cursor.execute("""
+            SELECT *
+            FROM zone
+            ORDER BY nom
+        """)
 
-    cursor.execute("SELECT * FROM zone")
     data = cursor.fetchall()
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template("zones.html", zones=data, user=session["user"],
-        role=session["role"])
+        role=session["role"], photo = user_photo["photo"] if user_photo else None)
 @app.route("/zones/add", methods=["POST"])
 def add_zone():
     nom = request.form["nom"]
@@ -1733,14 +1812,29 @@ def export_zones_pdf():
 #----------------------------------------------------------------
 @app.route("/produits")
 def produits():
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM produit")
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM produit
+            WHERE nom LIKE %s
+            ORDER BY nom
+        """, (f"%{search}%",))
+    else:
+        cursor.execute("""
+            SELECT *
+            FROM produit
+            ORDER BY nom
+        """)
     data = cursor.fetchall()
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template("produits.html", produits=data, user=session["user"],
-        role=session["role"])
+        role=session["role"], photo = user_photo["photo"] if user_photo else None)
 @app.route("/produits/add", methods=["POST"])
 def add_produit():
     nom = request.form["nom"]
@@ -1907,24 +2001,42 @@ def export_produits_pdf():
 #----------------------------------------------------------------
 @app.route("/campagnes")
 def campagnes():
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM campagne")
-    data = cursor.fetchall()
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM campagne
+            WHERE nom LIKE %s
+            ORDER BY nom
+        """, (f"%{search}%",))
+    else:
+        cursor.execute("""
+            SELECT *
+            FROM campagne
+            ORDER BY nom
+        """)
 
+    data = cursor.fetchall()
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template("campagnes.html", campagnes=data, user=session["user"],
-        role=session["role"])
+        role=session["role"], photo = user_photo["photo"] if user_photo else None)
 @app.route("/campagnes/add", methods=["POST"])
 def add_campagne():
     nom = request.form["nom"]
+    statut = request.form["statut"]
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO campagne (nom) VALUES (%s)",
-        (nom,)
+        "INSERT INTO campagne (nom, statut) VALUES (%s,%s)",
+        (nom,statut)
     )
     conn.commit()
     return redirect("/campagnes")
@@ -1950,15 +2062,16 @@ def edit_campagne(id):
 @app.route("/campagnes/update/<int:id>", methods=["POST"])
 def update_campagne(id):
     nom = request.form["nom"]
+    statut = request.form["statut"]
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         UPDATE campagne 
-        SET nom = %s
+        SET nom = %s, statut = %s
         WHERE id = %s
-    """, (nom, id))
+    """, (nom, statut,id))
 
     conn.commit()
     flash("Campagne modifiée avec succès ✅", "success")
@@ -1968,7 +2081,7 @@ def export_campagnes_excel():
 
     conn = get_db_connection()
 
-    query = "SELECT nom FROM campagne"
+    query = "SELECT nom, statut FROM campagne"
 
     df = pd.read_sql(query, conn)
 
@@ -1986,7 +2099,7 @@ def export_campagnes_pdf():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute(""" SELECT nom FROM campagne """)
+    cursor.execute(""" SELECT nom, statut FROM campagne """)
 
     data = cursor.fetchall()
 
@@ -2039,7 +2152,7 @@ def export_campagnes_pdf():
     # =========================
 
     table_data = [
-        ["Campagnes"]
+        ["Campagnes"], ["Statut"]
     ]
 
     for row in data:
@@ -2103,7 +2216,8 @@ def settings():
             )
 
         conn.commit()
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     # 👉 RÉCUPÉRATION SETTINGS
     cursor.execute("SELECT * FROM settings WHERE id=1")
     settings_data = cursor.fetchone()
@@ -2131,7 +2245,8 @@ def settings():
         settings=settings_data,
         stats=stats,
         user=session["user"],
-        role=session["role"]
+        role=session["role"],
+        photo = user_photo["photo"] if user_photo else None
     )
 #----------------------------------------------------------------
 # Routes clients statistiques
@@ -2200,7 +2315,8 @@ def clients_statistiques():
         totals["livraison"] += clean_number(row["cumul_montant_livraison"]) or 0
         totals["resultat"] += clean_number(row["resultat_livraison"]) or 0
         totals["sac"] += clean_number(row["sac_restant"]) or 0
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template(
         "clients-statistiques.html",
         data = data,
@@ -2208,7 +2324,8 @@ def clients_statistiques():
         format_number = format_number,
         campagnes = campagnes,
         user = session["user"],
-        role = session["role"]
+        role = session["role"],
+        photo = user_photo["photo"] if user_photo else None
     )
 #----------------------------------------------------------------
 # Routes pisteurs statistiques
@@ -2269,7 +2386,8 @@ def pisteurs_statistiques():
         totals["credit"] += clean_number(row["credit_cumul"]) or 0
         totals["solde"] += clean_number(row["solde"]) or 0
         totals["sac"] += clean_number(row["sac_restant"]) or 0
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template(
         "pisteurs-statistiques.html",
         data = data,
@@ -2277,7 +2395,8 @@ def pisteurs_statistiques():
         format_number = format_number,
         campagnes = campagnes,
         user = session["user"],
-        role = session["role"]
+        role = session["role"],
+        photo = user_photo["photo"] if user_photo else None
     )
 #----------------------------------------------------------------
 # Routes utilisateurs
@@ -2295,12 +2414,14 @@ def users():
 
     cursor.execute("SELECT * FROM utilisateur")
     users = cursor.fetchall()
-
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
     return render_template(
         "users.html",
         user=session["user"],
         role=session["role"],
-        users=users
+        users=users,
+        photo=user_photo["photo"] if user_photo else None
     )
 @app.route("/users/add", methods=["POST"])
 def add_user():
@@ -2481,6 +2602,101 @@ def export_users_pdf():
         file_path,
         as_attachment=True
     )
+#----------------------------------------------------------------
+#  Gestion du profil
+#----------------------------------------------------------------
+@app.route("/profil", methods=["GET", "POST"])
+def profil():
+    if "user" not in session:
+        return redirect("/")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # récupération de l'utilisateur connecté
+    cursor.execute(
+        "SELECT * FROM utilisateur WHERE username=%s",
+        (session["user"],)
+    )
+    user = cursor.fetchone()
+
+    if request.method == "POST":
+
+        nouveau_nom = request.form.get("username")
+        ancien_mdp = request.form.get("old_password")
+        nouveau_mdp = request.form.get("new_password")
+        confirmation = request.form.get("confirm_password")
+
+        # changement du nom
+        if nouveau_nom and nouveau_nom != user["username"]:
+            cursor.execute(
+                "UPDATE utilisateur SET username=%s WHERE id=%s",
+                (nouveau_nom, user["id"])
+            )
+            session["user"] = nouveau_nom
+
+        # changement du mot de passe
+        if ancien_mdp and nouveau_mdp:
+
+            cursor.execute(
+                "SELECT password FROM utilisateur WHERE id=%s",
+                (user["id"],)
+            )
+            current_password = cursor.fetchone()["password"]
+            #hash_password(password) == user["password"]
+            if hash_password(ancien_mdp) != current_password:
+                flash("Ancien mot de passe incorrect.", "danger")
+                return redirect("/profil")
+
+            elif nouveau_mdp != confirmation:
+                flash("Les deux nouveaux mots de passe sont différents.", "danger")
+                return redirect("/profil")
+            else:
+                hashed = hashlib.sha256(nouveau_mdp.encode()).hexdigest()
+                password_final = hashed
+                cursor.execute(
+                    "UPDATE utilisateur SET password=%s WHERE id=%s",
+                    (password_final, user["id"])
+                )
+                flash("Mot de passe modifié avec succès.", "success")
+                return redirect("/profil")
+            
+        file = request.files.get("photo")
+
+        # changement de la photo de profil
+        if file and allowed_file(file.filename):
+            import uuid
+
+            filename = str(uuid.uuid4()) + "_" + secure_filename(file.filename)
+
+            filepath = os.path.join(
+                app.config["PROFILE_UPLOAD_FOLDER"],
+                filename
+            )
+
+            file.save(filepath)
+
+            cursor.execute("""
+                UPDATE utilisateur
+                SET photo=%s
+                WHERE id=%s
+            """, (filename, user["id"]))
+
+        conn.commit()
+
+        return redirect("/profil")
+
+    return render_template(
+        "profil.html",
+        user=user
+    )
+#----------------------------------------------------------------
+# Log out
+#----------------------------------------------------------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 #----------------------------------------------------------------
 # Pour lancer l'app
 #----------------------------------------------------------------

@@ -130,20 +130,55 @@
                 </div>
             </div>
 
-            <div class="profile">
-                👤 {{ user }}<br>
-                <small>{{ role }}</small>
+            <div class="profile-menu">
+
+                <button class="profile-btn">
+                    {% if photo %}
+                        <img src="{{ url_for('static', filename='uploads/profiles/' + photo) }}"
+                            class="profile-avatar">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                            class="profile-avatar">
+                    {% endif %}
+
+                    <div class="profile-info">
+                        <span>{{ user }}</span>
+                        <small>{{ role }}</small>
+                    </div>
+
+                    ▼
+                </button>
+
+                <div class="dropdown-menu">
+                    <a href="/profil">👤 Mon profil</a>
+                    <a href="/logout">🚪 Déconnexion</a>
+                    <a href="/settings">⚙️ Paramètres</a>
+                </div>
+
             </div>
 
         </div>
-        <div class="export-buttons">
-            <a href="/produits/export/excel" class="excel-btn">
-                📊 Export Excel
-            </a>
+        <div class="actions-bar">
+            <div class="export-buttons">
+                <a href="/produits/export/excel" class="excel-btn">
+                    📊 Export Excel
+                </a>
 
-            <a href="/produits/export/pdf" class="pdf-btn">
-                📄 Export PDF
-            </a>
+                <a href="/produits/export/pdf" class="pdf-btn">
+                    📄 Export PDF
+                </a>
+            </div>
+            <div class="m-search">
+                <form method="GET" action="/produits">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Rechercher un produit..."
+                        value="{{ request.args.get('search', '') }}"
+                    >
+                    <button type="submit">🔍</button>
+                </form>
+            </div>
         </div>
         <!-- FORMULAIRE -->
         <div class="card">

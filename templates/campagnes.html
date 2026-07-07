@@ -130,20 +130,54 @@
                 </div>
             </div>
 
-            <div class="profile">
-                👤 {{ user }}<br>
-                <small>{{ role }}</small>
+            <div class="profile-menu">
+
+                <button class="profile-btn">
+                    {% if photo %}
+                        <img src="{{ url_for('static', filename='uploads/profiles/' + photo) }}"
+                            class="profile-avatar">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                            class="profile-avatar">
+                    {% endif %}
+
+                    <div class="profile-info">
+                        <span>{{ user }}</span>
+                        <small>{{ role }}</small>
+                    </div>
+
+                    ▼
+                </button>
+
+                <div class="dropdown-menu">
+                    <a href="/profil">👤 Mon profil</a>
+                    <a href="/logout">🚪 Déconnexion</a>
+                    <a href="/settings">⚙️ Paramètres</a>
+                </div>
+
             </div>
-
         </div>
-        <div class="export-buttons">
-            <a href="/campagnes/export/excel" class="excel-btn">
-                📊 Export Excel
-            </a>
+        <div class="actions-bar">
+            <div class="export-buttons">
+                <a href="/campagnes/export/excel" class="excel-btn">
+                    📊 Export Excel
+                </a>
 
-            <a href="/campagnes/export/pdf" class="pdf-btn">
-                📄 Export PDF
-            </a>
+                <a href="/campagnes/export/pdf" class="pdf-btn">
+                    📄 Export PDF
+                </a>
+            </div>
+            <div class="m-search">
+                <form method="GET" action="/campagnes">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Rechercher une campagne..."
+                        value="{{ request.args.get('search', '') }}"
+                    >
+                    <button type="submit">🔍</button>
+                </form>
+            </div>
         </div>
         <!-- FORMULAIRE -->
         <div class="card">
@@ -151,6 +185,7 @@
 
             <form method="POST" action="/campagnes/add" class="form">
                 <input name="nom" placeholder="Nom" required>
+                <input name="statut" placeholder="Statut" required>
                 <button type="submit">Ajouter</button>
             </form>
         </div>
@@ -163,6 +198,7 @@
                 <thead>
                     <tr>
                         <th>Nom</th>
+                        <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -171,6 +207,7 @@
                     {% for c in campagnes %}
                     <tr>
                         <td>{{ c.nom }}</td>
+                        <td>{{ c.statut }}</td>
                         <td>
                             <button class="edit-btn"><a href="/campagnes/edit/{{ c.id }}">✏️ Modifier</a></button>
                         </td> 

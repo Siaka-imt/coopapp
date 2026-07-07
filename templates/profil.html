@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients</title>
+    <title>Mon profil</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -20,9 +21,8 @@
     </div>
   {% endif %}
 {% endwith %}
-    <!-- SIDEBAR -->
 <div class="dashboard-layout">
-        
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
@@ -43,13 +43,13 @@
                 <div class="sidebar-section-title">PRINCIPAL</div>
                 <ul class="sidebar-nav">
                     <li class="sidebar-nav-item">
-                        <a href="/dashboard" class="sidebar-nav-link">
+                        <a href="/dashboard" class="sidebar-nav-link active">
                             <span class="sidebar-nav-icon">📊</span>
                             <span>Tableau de bord</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
-                        <a href="/clients" class="sidebar-nav-link active">
+                        <a href="/clients" class="sidebar-nav-link ">
                             <span class="sidebar-nav-icon">👥</span>
                             <span>Clients</span>
                         </a>
@@ -111,15 +111,15 @@
                 </ul>
             </div>
         </aside>
+
     <!-- MAIN -->
     <main class="main">
-
         <!-- TOPBAR -->
         <div class="topbar">
 
             <div class="header-left">
-                <h1>Clients</h1>
-                <p>Gestion de la clientèle</p>
+                <h1>Mon profil</h1>
+                <p>Gestion de vos informations personnelles</p>
             </div>
 
             <div class="header-center">
@@ -129,125 +129,83 @@
                 </div>
             </div>
 
-            <div class="profile-menu">
+            <div class="profile">
+                👤 {{ user.username }}<br>
+                <small>{{ user.role }}</small>
+            </div>
 
-                <button class="profile-btn">
-                    {% if photo %}
-                        <img src="{{ url_for('static', filename='uploads/profiles/' + photo) }}"
-                            class="profile-avatar">
+        </div>
+
+        <div class="profile-card">
+
+            <h2>MON PROFIL</h2>
+
+            <form method="POST" enctype="multipart/form-data">
+
+                <div class="photo-section">
+
+                    {% if user.photo %}
+                        <img src="{{ url_for('static', filename='uploads/profiles/' + user.photo) }}"
+                             class="profile-photo">
                     {% else %}
-                        <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
-                            class="profile-avatar">
+                        <div class="profile-photo-placeholder">
+                            📷
+                        </div>
                     {% endif %}
 
-                    <div class="profile-info">
-                        <span>{{ user }}</span>
-                        <small>{{ role }}</small>
-                    </div>
+                    <input type="file" name="photo">
 
-                    ▼
-                </button>
-
-                <div class="dropdown-menu">
-                    <a href="/profil">👤 Mon profil</a>
-                    <a href="/logout">🚪 Déconnexion</a>
-                    <a href="/settings">⚙️ Paramètres</a>
                 </div>
 
-            </div>
-
-        </div>
-        <div class="actions-bar">
-            <div class="export-buttons ">
-                <a href="/clients/export/excel" class="excel-btn">
-                    📊 Export Excel
-                </a>
-
-                <a href="/clients/export/pdf" class="pdf-btn">
-                    📄 Export PDF
-                </a>
-            </div>
-            <div class="m-search">
-                <form method="GET" action="/clients">
+                <div class="form-group">
+                    <label>Nom d'utilisateur</label>
                     <input
                         type="text"
-                        name="search"
-                        placeholder="Rechercher un client..."
-                        value="{{ request.args.get('search', '') }}"
-                    >
-                    <button type="submit">🔍</button>
-                </form>
-            </div>
-        </div>
+                        name="username"
+                        value="{{ user.username }}">
+                </div>
 
-        <!-- FORMULAIRE -->
-        <div class="card">
-            <h3>Ajouter un client</h3>
+                <div class="form-group">
+                    <label>Adresse email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value="{{ user.email or '' }}">
+                </div>
 
-            <form method="POST" action="/clients/add" class="form">
-                <input name="nom" placeholder="Nom" required>
-                <input name="contact" placeholder="Contact" required>
-                <input name="localisation" placeholder="Localisation" required>
-                <button type="submit">Ajouter</button>
+                <hr>
+
+                <div class="form-group">
+                    <label>Mot de passe actuel</label>
+                    <input
+                        type="password"
+                        name="old_password">
+                </div>
+
+                <div class="form-group">
+                    <label>Nouveau mot de passe</label>
+                    <input
+                        type="password"
+                        name="new_password">
+                </div>
+
+                <div class="form-group">
+                    <label>Confirmation</label>
+                    <input
+                        type="password"
+                        name="confirm_password">
+                </div>
+
+                <button class="save-btn">
+                    💾 Enregistrer
+                </button>
+
             </form>
-        </div>
-
-            <!-- TABLE -->
-            <div class="card">
-                <h3>Liste des clients</h3>
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Contact</th>
-                        <th>Localisation</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for c in clients %}
-                    <tr>
-                        <td>{{ c.nom }}</td>
-                        <td>{{ c.contact }}</td>
-                        <td>{{ c.localisation }}</td>
-                        <td>
-                            <button class="select-btn"><a href="/clients/select/{{ c.nom }}">🔍 Voir fiche</a></button>
-                        </td> 
-
-                        <td>
-                            <button class="edit-btn"><a href="/clients/edit/{{ c.id }}">✏️ Modifier</a></button>
-                        </td> 
-                        <td>
-                            <form method="POST" action="/clients/delete/{{ c.id }}">
-                                <button type="submit" class="delete-btn"
-                                        onclick="return confirm('Supprimer ce client ?')">
-                                    🗑 Supprimer
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
 
         </div>
 
     </main>
 
 </div>
-
 </body>
-<script>
-    setTimeout(function() {
-        const flash = document.getElementById("flash-message");
-        if (flash) {
-            flash.style.transition = "all 0.5s ease";
-            flash.style.opacity = "0";
-            flash.style.transform = "translateY(-10px)";
-            setTimeout(() => flash.remove(), 500);
-        }
-    }, 1000);
-</script>
 </html>
