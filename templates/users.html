@@ -158,14 +158,27 @@
             </div>
 
         </div>
-        <div class="export-buttons">
-            <a href="/users/export/excel" class="excel-btn">
-                📊 Export Excel
-            </a>
+        <div class="actions-bar">
+            <div class="export-buttons">
+                <a href="/users/export/excel" class="excel-btn">
+                    📊 Export Excel
+                </a>
 
-            <a href="/users/export/pdf" class="pdf-btn">
-                📄 Export PDF
-            </a>
+                <a href="/users/export/pdf" class="pdf-btn">
+                    📄 Export PDF
+                </a>
+            </div>
+            <div class="m-search">
+                <form method="GET" action="/users">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Rechercher un utilisateur..."
+                        value="{{ request.args.get('search', '') }}"
+                    >
+                    <button type="submit">🔍</button>
+                </form>
+            </div>
         </div>
         <!-- FORMULAIRE -->
         <div class="card">

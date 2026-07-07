@@ -2408,11 +2408,20 @@ def users():
     role = session["role"]
     if role != "Admin":
         return render_template("acces-denied.html")
+    search = request.args.get("search", "").strip()
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM utilisateur")
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM utilisateur
+            WHERE username LIKE %s
+            ORDER BY username
+        """, (f"%{search}%",))
+    else:
+        cursor.execute("SELECT * FROM utilisateur")
     users = cursor.fetchall()
     cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
     user_photo = cursor.fetchone()
