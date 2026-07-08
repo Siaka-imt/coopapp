@@ -1126,14 +1126,14 @@ def add_fiche_pisteur():
     pisteur = request.form["pisteur"]
     date = request.form["date"]
 
-    prix = int(request.form["prix"])
-    poids_net = int(request.form["poids_net"])
+    prix = request.form["prix"]
+    poids_net = request.form["poids_net"]
 
-    debit = int(request.form["debit"])
-    credit = int(request.form["credit"])
+    debit = request.form["debit"]
+    credit = request.form["credit"]
 
-    sac_recu = int(request.form["sac_reçu"])
-    sac_livre = int(request.form["sac_livre"])
+    sac_recu = request.form["sac_reçu"]
+    sac_livre = request.form["sac_livre"]
 
     detail = request.form["detail"]
     campagne = request.form["campagne"]
