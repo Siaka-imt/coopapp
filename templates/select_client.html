@@ -207,9 +207,9 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th>Date</th>
                         <th>Montant</th>
                         <th>Cumul</th>
-                        <th>Date</th>
                         <th>Date de dechargement</th>
                         <th>Numero camion</th>
                         <th>Numero fiche</th>
@@ -230,9 +230,9 @@
                 <tbody>
                     {% for c in client_select %}
                     <tr>
+                        <td>{{ c.date }}</td>
                         <td>{{ format_number_after(format_number(c.montant)) }}</td>
                         <td>{{ format_number_after(format_number(c.cumul)) }}</td>
-                        <td>{{ c.date }}</td>
                         <td>{{ c.date_dechargement }}</td>
                         <td>{{ c.numero_camion }}</td>
                         <td>{{ c.numero_fiche }}</td>

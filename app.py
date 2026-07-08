@@ -423,8 +423,7 @@ def dashboard():
 
     campagnes_labels = [row[0] for row in campagnes_data]
     campagnes_values = [int(row[1]) for row in campagnes_data]
-    print(campagnes_labels)
-    print(campagnes_values)
+
     cursor.close()
     conn.close()
     return render_template(
