@@ -236,7 +236,7 @@ def login():
     return render_template("login.html")
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
-
+    
     if request.method == "POST":
 
         email = request.form["email"]
@@ -459,6 +459,11 @@ def clients():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary = True)
 
+    cursor.execute("SELECT DISTINCT campagne FROM client")
+    campagnes = cursor.fetchall()
+
+    campagne = request.args.get("campagne")
+
     if search:
         cursor.execute("""
             SELECT *
@@ -466,29 +471,39 @@ def clients():
             WHERE nom LIKE %s
             ORDER BY nom
         """, (f"%{search}%",))
-    else:
+    elif campagne:
         cursor.execute("""
             SELECT *
             FROM client
+            WHERE campagne = %s
             ORDER BY nom
-        """)
+        """, (campagne,))
+    else:
+        query = """
+            SELECT * from client
+            ORDER BY nom
+        """
+        cursor.execute(query,)
+    
     clients = cursor.fetchall()
+
     cursor.execute("SELECT photo FROM utilisateur WHERE username = %s", (session["user"],))
     user_photo = cursor.fetchone()
-    return render_template("clients.html",clients = clients,user = session["user"],
+    return render_template("clients.html",clients = clients,user = session["user"], campagnes = campagnes,
         role = session["role"], photo = user_photo["photo"] if user_photo else None)
 @app.route("/clients/add", methods = ["POST"])
 def add_client():
+    
     nom = request.form["nom"]
     contact = request.form["contact"]
     localisation = request.form["localisation"]
-
+    campagne = request.form["campagne"]
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO client (contact, nom, localisation) VALUES (%s, %s, %s)",
-        (contact, nom, localisation)
+        "INSERT INTO client (contact, nom, localisation, campagne) VALUES (%s, %s, %s, %s)",
+        (contact, nom, localisation, campagne)
     )
 
     conn.commit()
@@ -517,15 +532,16 @@ def update_client(id):
     nom = request.form["nom"]
     contact = request.form["contact"]
     localisation = request.form["localisation"]
+    campagne = request.form["campagne"]
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         UPDATE client 
-        SET nom = %s, contact = %s, localisation = %s
+        SET nom = %s, contact = %s, localisation = %s, campagne = %s
         WHERE id = %s
-    """, (nom, contact, localisation, id))
+    """, (nom, contact, localisation, campagne, id))
 
     conn.commit()
     flash("Client modifié avec succès ✅", "success")
@@ -615,7 +631,6 @@ def update_fiche_client(id):
     numero_fiche = request.form["numero_fiche"]
     poids_net = request.form["poids_net"]
     prix = request.form["prix"]
-    montant_livraison = request.form["montant_livraison"]
     sac_reçu = request.form["sac_reçu"]
     sac_livre = request.form["sac_livre"]
     campagne = request.form["campagne"]
@@ -630,6 +645,8 @@ def update_fiche_client(id):
         return "Fiche introuvable", 404
 
     client_nom = result[0]
+
+    montant_livraison = clean_number(poids_net) * clean_number(prix)
 
     cursor.execute("""
         UPDATE fiche_client 
@@ -655,7 +672,6 @@ def add_fiche_client():
     numero_fiche = request.form["numero_fiche"]
     poids_net = request.form["poids_net"]
     prix = request.form["prix"]
-    montant_livraison = request.form["montant_livraison"]
     sac_reçu = request.form["sac_reçu"]
     sac_livre = request.form["sac_livre"]
     campagne = request.form["campagne"]
@@ -680,20 +696,22 @@ def add_fiche_client():
 
     last_cumul = 0
     last_poids = 0
-    last_montant_livraison = 0
+    last_cumul_montant_livraison = 0
     last_sac = 0
 
     if last:
         last_cumul = last["cumul"] or 0
         last_poids = last["cumul_poids_net"] or 0
-        last_montant_livraison = last["cumul_montant_livraison"] or 0
+        last_cumul_montant_livraison = last["cumul_montant_livraison"] or 0
         last_sac = last["sac_restant"] or 0
     
     cumul_poids_net = clean_number(last_poids) + clean_number(poids_net)
 
     cumul = clean_number(last_cumul) + clean_number(montant)
 
-    cumul_montant_livraison = clean_number(last_montant_livraison) + clean_number(montant_livraison)
+    montant_livraison = clean_number(poids_net) * clean_number(prix)
+
+    cumul_montant_livraison = clean_number(last_cumul_montant_livraison) + clean_number(montant_livraison)
 
     sac_restant = clean_number(last_sac) + clean_number(sac_reçu) - clean_number(sac_livre)
 
@@ -709,7 +727,7 @@ def add_fiche_client():
             sac_restant,montant, campagne))
 
     conn.commit()
-    return redirect(url_for("voir_client", nom=nom))
+    return redirect(url_for("voir_client", nom = nom))
 @app.route("/clients/export/excel")
 def export_clients_excel():
 
@@ -949,14 +967,21 @@ def pisteurs():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
+    cursor.execute("SELECT DISTINCT campagne FROM client")
+    campagnes = cursor.fetchall()
+    
+    campagne = request.args.get("campagne")
+
     if search:
         cursor.execute("SELECT * FROM pisteur WHERE nom LIKE %s", (f"%{search}%",))
+    elif campagne:
+        cursor.execute("SELECT * FROM pisteur WHERE campagne = %s ORDER BY nom", (campagne,))
     else:
-        cursor.execute("SELECT * FROM pisteur")
+        cursor.execute("SELECT * FROM pisteur ORDER BY nom")
     data = cursor.fetchall()
     cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
     user_photo = cursor.fetchone()
-    return render_template("pisteurs.html", pisteurs=data, user=session["user"],role=session["role"],photo=user_photo["photo"] if user_photo else None)
+    return render_template("pisteurs.html", campagnes = campagnes, pisteurs = data, user = session["user"],role = session["role"],photo = user_photo["photo"] if user_photo else None)
 @app.route("/pisteurs/add", methods=["POST"])
 def add_pisteur():
     nom = request.form["nom"]
@@ -992,7 +1017,7 @@ def edit_pisteur(id):
     cursor.execute("SELECT * FROM pisteur WHERE id = %s", (id,))
     pisteur = cursor.fetchone()
 
-    return render_template("edit_pisteur.html", pisteur=pisteur)
+    return render_template("edit_pisteur.html", pisteur = pisteur)
 @app.route("/pisteurs/update/<int:id>", methods=["POST"])
 def update_pisteur(id):
     nom = request.form["nom"]
@@ -1039,12 +1064,12 @@ def voir_pisteur(nom):
 
     return render_template(
         "select_pisteur.html",
-        nom_pisteur=nom,
-        pisteur_select=pisteur,
-        user=session["user"],
-        role=session["role"],
-        format_number=clean_number,
-        format_number_after=format_number_after
+        nom_pisteur = nom,
+        pisteur_select = pisteur,
+        user = session["user"],
+        role = session["role"],
+        format_number = clean_number,
+        format_number_after = format_number_after
     )
 @app.route("/pisteurs/delete_fiche/<int:id>", methods = ["POST"])
 def delete_pisteur_fiche(id):
@@ -1087,7 +1112,7 @@ def update_fiche_pisteur(id):
     prix = int(request.form["prix"])
     poids_net = int(request.form["poids_net"])
 
-    debit = int(request.form["debit"])
+    #debit = int(request.form["debit"])
     credit = int(request.form["credit"])
 
     sac_reçu = int(request.form["sac_reçu"])
@@ -1106,6 +1131,7 @@ def update_fiche_pisteur(id):
         return "Fiche introuvable", 404
 
     pisteur_nom = result[0]
+    debit = clean_number(poids_net) * clean_number(prix)
 
     cursor.execute("""
             UPDATE fiche_pisteur
@@ -1129,7 +1155,6 @@ def add_fiche_pisteur():
     prix = request.form["prix"]
     poids_net = request.form["poids_net"]
 
-    debit = request.form["debit"]
     credit = request.form["credit"]
 
     sac_recu = request.form["sac_reçu"]
@@ -1170,6 +1195,7 @@ def add_fiche_pisteur():
     # =========================
     # CALCULS AUTOMATIQUES
     # =========================
+    debit = clean_number(poids_net) * clean_number(prix)
 
     poids_cumul = clean_number(last_poids) + clean_number(poids_net)
 
@@ -2190,6 +2216,8 @@ def export_campagnes_pdf():
 #----------------------------------------------------------------
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
+    if "user" not in session:
+        return redirect("/")
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
