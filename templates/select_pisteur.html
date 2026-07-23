@@ -200,11 +200,11 @@
         
             <!-- TABLE -->
             <div class="card">
-                <h3>fiche du pisteur : {{ nom_pisteur }}</h3>
 
-            <table class="table">
+            <table class="table-fiche-pisteur">
                 <thead>
-                    <tr>
+                    <!-- Première ligne : catégories -->
+                    <tr class="table-group-header">
                         <th>Date</th>
                         <th>Detail</th>
                         <th>Prix</th>
@@ -219,7 +219,8 @@
                         <th>Sac livre</th>
                         <th>Sac restant</th>
                         <th>Campagne</th>
-                        <th>Actions</th>
+                        <th>Modifier</th>
+                        <th>Supprimer</th>
                     </tr>
                 </thead>
 

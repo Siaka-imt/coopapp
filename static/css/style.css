@@ -867,3 +867,99 @@ input:focus {
 }
 
 /* Responsive Design */
+.table-group-header th {
+    background: #eb9526;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    padding: 15px 20px;
+    border-right: 1px solid rgba(255,255,255,0.5);
+    border-bottom: 1px solid white;
+    white-space: nowrap;
+}
+
+.table-fiche-client thead tr:nth-child(2) th {
+    background: #ebb057;
+    color: white;
+    font-size: 13px;
+    text-align: center;
+    padding: 12px 15px;
+    white-space: nowrap;
+}
+
+.table-fiche-client {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+/* Cellules du tableau */
+.table-fiche-client th,
+.table-fiche-client td {
+    padding: 15px 20px;
+    text-align: center;
+    border-right: 1px solid #d5d5d5;
+    border-bottom: 1px solid #d5d5d5;
+    white-space: nowrap;
+}
+
+/* Supprimer la bordure droite de la dernière colonne */
+.table-fiche-client th:last-child,
+.table-fiche-client td:last-child {
+    border-right: none;
+}
+
+.table-fiche-client td:nth-child(3),
+.table-fiche-client td:nth-child(8),
+.table-fiche-client td:nth-child(9),
+.table-fiche-client td:nth-child(11),
+.table-fiche-client td:nth-child(12),
+.table-fiche-client td:nth-child(15) {
+    background-color: #f3f3f3;
+    color: #2d5f8a;
+    font-weight: 500;
+}
+/* Table fiche pisteur*/
+.table-fiche-pisteur thead tr:nth-child(2) th {
+    background: #ebb057;
+    color: white;
+    font-size: 13px;
+    text-align: center;
+    padding: 12px 15px;
+    white-space: nowrap;
+}
+
+.table-fiche-pisteur {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+/* Cellules du tableau */
+.table-fiche-pisteur th,
+.table-fiche-pisteur td {
+    padding: 15px 20px;
+    text-align: center;
+    border-right: 1px solid #d5d5d5;
+    border-bottom: 1px solid #d5d5d5;
+    white-space: nowrap;
+}
+
+/* Supprimer la bordure droite de la dernière colonne */
+.table-fiche-pisteur th:last-child,
+.table-fiche-pisteur td:last-child {
+    border-right: none;
+}
+
+.table-fiche-pisteur td:nth-child(5),
+.table-fiche-pisteur td:nth-child(6),
+.table-fiche-pisteur td:nth-child(7),
+.table-fiche-pisteur td:nth-child(9),
+.table-fiche-pisteur td:nth-child(10),
+.table-fiche-pisteur td:nth-child(13) {
+    background-color: #f3f3f3;
+    color: #2d5f8a;
+    font-weight: 500;
+}
+
