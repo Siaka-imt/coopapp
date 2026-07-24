@@ -180,6 +180,83 @@
                 </form>
             </div>
         </div>
+        
+        <!-- TABLE -->
+        <div class="fiche-header">
+
+            <h2>Fiche de suivi de financements et de livraisons de produits</h2>
+
+            <!-- Informations du client -->
+            <div class="fiche-info">
+
+                <div class="info-item">
+                    <strong>Nom :</strong>
+                    <span>{{ nom_client }}</span>
+                </div>
+
+                <div class="info-item">
+                    <strong>Localisation :</strong>
+                    <span>{{ client_info.localisation }}</span>
+                </div>
+
+                <div class="info-item">
+                    <strong>Contact :</strong>
+                    <span>{{ client_info.contact }}</span>
+                </div>
+
+                <div class="info-item">
+                    <strong>Campagne :</strong>
+
+                    <select onchange="changerCampagne(this.value)">
+                        {% for campagne in campagnes %}
+                            <option value="{{ campagne.campagne }}"
+                                {% if campagne.campagne == campagne_selected %}
+                                    selected
+                                {% endif %}>
+                                {{ campagne.campagne }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="campaign-stats">
+
+            <h3>Statistiques de la campagne</h3>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <span>Cumul</span>
+                    <strong>{{ format_number_after(format_number(totals.cumul)) }} FCFA</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Cumul Poids Net</span>
+                    <strong>{{ format_number_after(format_number(totals.poids)) }} Kg</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Cumul Montant Livraison</span>
+                    <strong>{{ format_number_after(format_number(totals.livraison)) }} FCFA</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Résultat après livraison</span>
+                    <strong>{{ format_number_after(format_number(totals.resultat)) }} FCFA</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Sacs restants</span>
+                    <strong>{{ format_number_after(format_number(totals.sac)) }}</strong>
+                </div>
+
+            </div>
+
+        </div>
         <!-- FORMULAIRE -->
         <div class="card">
             <h3>Ajouter une ligne</h3>
@@ -199,7 +276,6 @@
                 <button type="submit">Ajouter</button>
             </form>
         </div>
-            <!-- TABLE -->
         <div class="card">
             <table class="table-fiche-client">
                 <thead>
@@ -298,6 +374,19 @@ function retour() {
             setTimeout(() => flash.remove(), 500);
         }
     }, 1000);
+</script>
+<script>
+function changerCampagne(campagne) {
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("campagne", campagne);
+
+    // Supprimer une éventuelle recherche précédente
+    url.searchParams.delete("search");
+
+    window.location.href = url.toString();
+}
 </script>
 </body>
 </html>

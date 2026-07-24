@@ -169,7 +169,7 @@
                 </a>
             </div>
             <div class="m-search">
-                <form method="GET" action="/fiche_pisteurs/{{ nom_pisteur }}">
+                <form method="GET" action="/pisteurs/select/{{ nom_pisteur }}">
                     <input
                         type="text"
                         name="search"
@@ -179,6 +179,80 @@
                     <button type="submit">🔍</button>
                 </form>
             </div>
+        </div>
+        <div class="fiche-header">
+
+            <h2>SOCIETE COOPERATIVE DES PRODUCTEURS AGRICOLES WOTAGAWENA KORHOGO
+                N°CC: 1995 404 P</h2>
+
+            <!-- Informations du client -->
+            <div class="fiche-info">
+
+                <div class="info-item">
+                    <strong>Nom :</strong>
+                    <span>{{ nom_pisteur }}</span>
+                </div>
+
+                <div class="info-item">
+                    <strong>Zone :</strong>
+                    <span>{{ pisteur_info.zone }}</span>
+                </div>
+
+                <div class="info-item">
+                    <strong>Contact :</strong>
+                    <span>{{ pisteur_info.contact }}</span>
+                </div>
+
+                <div class="info-item">
+                    <strong>Campagne :</strong>
+
+                    <select onchange="changerCampagne(this.value)">
+                        {% for campagne in campagnes %}
+                            <option value="{{ campagne.campagne }}"
+                                {% if campagne.campagne == campagne_selected %}
+                                    selected
+                                {% endif %}>
+                                {{ campagne.campagne }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+        </div>
+        <div class="campaign-stats">
+
+            <h3>Statistiques de la campagne</h3>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <span>Cumul Poids</span>
+                    <strong>{{ format_number_after(format_number(totals.poids)) }} FCFA</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Cumul Débit</span>
+                    <strong>{{ format_number_after(format_number(totals.debit)) }} Kg</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Cumul Crédit</span>
+                    <strong>{{ format_number_after(format_number(totals.credit)) }} FCFA</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Solde</span>
+                    <strong>{{ format_number_after(format_number(totals.solde)) }} FCFA</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span>Sacs restants</span>
+                    <strong>{{ format_number_after(format_number(totals.sac)) }}</strong>
+                </div>
+
+            </div>
+
         </div>
         <!-- FORMULAIRE -->
         <div class="card">
@@ -278,6 +352,19 @@ function retour() {
             setTimeout(() => flash.remove(), 500);
         }
     }, 1000);
+</script>
+<script>
+function changerCampagne(campagne) {
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("campagne", campagne);
+
+    // Supprimer une éventuelle recherche précédente
+    url.searchParams.delete("search");
+
+    window.location.href = url.toString();
+}
 </script>
 </body>
 </html>

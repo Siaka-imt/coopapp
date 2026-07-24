@@ -555,22 +555,127 @@ def select_client(nom):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    if search:
-        cursor.execute("""
-            SELECT *
-            FROM fiche_client
-            WHERE date LIKE %s and client = %s
-            ORDER BY date DESC
-        """, (f"%{search}%", nom))
-    else:
-        cursor.execute("SELECT * FROM fiche_client WHERE client = %s", (nom,))
+    # =========================================================
+    # 1. Récupérer les campagnes disponibles pour CE client
+    # =========================================================
+    cursor.execute("""
+    SELECT DISTINCT campagne
+    FROM fiche_client
+    WHERE client = %s 
+    ORDER BY campagne DESC""", 
+    (nom,))
 
-    #cursor.execute("SELECT * FROM fiche_client WHERE client = %s", (nom,))
-    client = cursor.fetchall()
-    cursor.execute("SELECT photo FROM utilisateur WHERE username = %s", (session["user"],))
+    campagnes = cursor.fetchall()
+
+    # ==========================================================
+    # 2. INFORMATIONS GÉNÉRALES DU CLIENT
+    # ==========================================================
+    campagne_selected = request.args.get("campagne")
+
+    # Si aucune campagne n'est sélectionnée,
+    # prendre la première campagne disponible
+    if not campagne_selected and campagnes:
+        campagne_selected = campagnes[0]["campagne"]
+    # =========================================================
+    # 3. Récupérer les dernières données du client
+    #    pour la campagne sélectionnée
+    # =========================================================
+    client_fiche = []
+
+    if campagne_selected:
+
+        if search :
+            cursor.execute("""
+                SELECT * 
+                FROM fiche_client
+                WHERE client = %s
+                AND campagne = %s
+                AND date LIKE %s
+                ORDER BY date DESC
+                """, (nom, campagne_selected, f"%{search}%"))
+
+        else:
+            cursor.execute("""
+                SELECT *
+                FROM fiche_client
+                WHERE client = %s
+                AND campagne = %s
+                ORDER BY date ASC
+                """, (nom, campagne_selected))
+
+        client_fiche = cursor.fetchall()
+
+    # =========================================================
+    # 4. Calculer les statistiques de la campagne
+    # =========================================================
+    totals = {
+                "cumul": 0,
+                "poids": 0,
+                "livraison": 0,
+                "resultat": 0,
+                "sac": 0
+            }
+    def format_number(value):
+        if value is None or str(value).strip() == "":
+            return ""
+        if value == 'None':
+            return ""
+        return "{:,}".format(int(str(value).replace(" ", ""))).replace(",", " ")
+
+    # On prend la dernière ligne de la campagne
+    # pour récupérer les valeurs cumulées finales
+    if client_fiche :
+        derniere_ligne = client_fiche[-1]
+
+        totals["cumul"] = clean_number(
+            derniere_ligne.get("cumul")
+        )
+        totals["poids"] = clean_number(
+            derniere_ligne.get("cumul_poids_net")
+        )
+
+        totals["livraison"] = clean_number(
+            derniere_ligne.get("cumul_montant_livraison")
+        )
+
+        totals["resultat"] = clean_number(
+            derniere_ligne.get("resultat_livraison")
+        )
+
+        totals["sac"] = clean_number(
+            derniere_ligne.get("sac_restant")
+        )
+
+    # =========================================================
+    # 5. Récupérer les informations générales du client
+    # =========================================================
+    cursor.execute("""
+        SELECT * 
+        FROM client
+        WHERE nom = %s""", 
+        (nom,))
+    
+    client_info = cursor.fetchone()
+
+    # =========================================================
+    # 6. Récupérer la photo de l'utilisateur connecté
+    # =========================================================
+    cursor.execute("""
+        SELECT photo
+        FROM utilisateur
+        WHERE username = %s""",
+        (session["user"],))
+    
     user_photo = cursor.fetchone()
-    return render_template("select_client.html",nom_client = nom, client_select = client, user = session["user"],
-        role = session["role"],format_number=clean_number,format_number_after=format_number_after, photo=user_photo["photo"] if user_photo else None)
+
+    # ==========================================================
+    # 7. Affichage
+    # ==========================================================
+
+    return render_template(
+        "select_client.html",
+        nom_client = nom, campagnes = campagnes, campagne_selected = campagne_selected, client_info = client_info, totals=totals, client_select = client_fiche, user = session["user"],
+        role = session["role"], format_number=format_number, format_number_after=format_number_after, photo=user_photo["photo"] if user_photo else None)
 @app.route("/clientS/<nom>")
 def voir_client(nom):
     conn = get_db_connection()
@@ -1045,15 +1150,103 @@ def select_pisteur(nom):
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    if search:
-        cursor.execute("SELECT * FROM fiche_pisteur WHERE date LIKE %s and pisteur = %s", (f"%{search}%", nom))
-    else:
-        cursor.execute("SELECT * FROM fiche_pisteur WHERE pisteur = %s", (nom,))
-    pisteur = cursor.fetchall()
+
+    # =========================================================
+    # 1. Récupérer les campagnes disponibles pour CE client
+    # =========================================================
+    cursor.execute("""
+        SELECT DISTINCT campagne
+        FROM fiche_pisteur
+        WHERE pisteur = %s
+        ORDER BY campagne DESC""", (nom,))
+    campagnes = cursor.fetchall()
+
+    # =========================================================
+    # 2. Récupérer la campagne sélectionnée
+    # =========================================================
+    campagne_selected = request.args.get("campagne")
+
+    # Si aucune campagne n'est sélectionnée,
+    # prendre la première campagne disponible
+    if not campagne_selected and campagnes:
+        campagne_selected = campagnes[0]["campagne"]
+
+    # =========================================================
+    # 3. Récupérer les dernières données du client
+    #    pour la campagne sélectionnée
+    # =========================================================
+    pisteur_fiche = []
+
+    if campagne_selected:
+
+        if search:
+            cursor.execute("""
+                SELECT * 
+                FROM fiche_pisteur
+                WHERE pisteur = %s
+                AND campagne = %s
+                AND date LIKE %s
+                ORDER BY date DESC
+            """, (nom, campagne_selected, f"%{search}"))
+
+        else:
+            cursor.execute("""
+                SELECT *
+                FROM fiche_pisteur
+                WHERE pisteur = %s
+                AND campagne = %s
+                ORDER BY date ASC""",(nom, campagne_selected))
+        pisteur_fiche = cursor.fetchall()
+    # =========================================================
+    # 4. Calculer les statistiques de la campagne
+    # =========================================================
+    totals = {
+        "cumul": 0,
+        "poids": 0,
+        "livraison": 0,
+        "resultat": 0,
+        "sac": 0
+    }
+    # On prend la dernière ligne de la campagne
+    # pour récupérer les valeurs cumulées finales
+    if pisteur_fiche:
+
+        derniere_ligne = pisteur_fiche[-1]
+
+        totals["poids"] = clean_number(
+            derniere_ligne.get("poids_cumul"))
+        
+        totals["debit"] = clean_number(
+            derniere_ligne.get("debit_cumul"))
+        
+        totals["credit"] = clean_number(
+            derniere_ligne.get("credit_cumul"))
+        
+        totals["solde"] = clean_number(
+            derniere_ligne.get("solde"))
+        
+        totals["sac"] = clean_number(
+            derniere_ligne.get("sac_restant"))
+
+    # =========================================================
+    # 5. Récupérer les informations générales du client
+    # =========================================================
+    cursor.execute("""
+        SELECT *
+        FROM pisteur
+        WHERE nom = %s
+    """, (nom,))
+
+    pisteur_info = cursor.fetchone()
+
+    # =========================================================
+    # 6. Récupérer la photo de l'utilisateur connecté
+    # =========================================================
     cursor.execute("SELECT photo FROM utilisateur WHERE username = %s", (session["user"],))
     user_photo = cursor.fetchone()
-    return render_template("select_pisteur.html",nom_pisteur = nom, pisteur_select=pisteur, user=session["user"],
-        role=session["role"],format_number=clean_number, format_number_after=format_number_after,photo = user_photo["photo"] if user_photo else None)
+
+    return render_template("select_pisteur.html",campagnes = campagnes, campagne_selected = campagne_selected, totals = totals, pisteur_info=pisteur_info, nom_pisteur = nom, pisteur_select=pisteur_fiche, user=session["user"],
+        role=session["role"],format_number = clean_number, format_number_after = format_number_after,photo = user_photo["photo"] if user_photo else None)
 @app.route("/pisteurs/<nom>")
 def voir_pisteur(nom):
     conn = get_db_connection()

@@ -179,53 +179,64 @@
                 </form>
             </div>
         </div>
-        <!-- FORMULAIRE -->
-        <div class="card">
-            <h3>Ajouter une campagne</h3>
-
-            <form method="POST" action="/campagnes/add" class="form">
-                <input name="nom" placeholder="Nom" required>
-                <input name="statut" placeholder="Statut" required>
-                <button type="submit">Ajouter</button>
-            </form>
+        <div class="stats-grid-client-pisteur">
+            <div class="stat-card">
+                <h4>Total Campagnes</h4>
+                <p>{{ campagnes|length }}</p>
+            </div>
+            <div class="stat-card green">
+                <h4>Campagnes actives</h4>
+                <p>{{ campagnes|length }}</p>
+            </div>
         </div>
+        <div class="settings-container">
+            <!-- FORMULAIRE -->
+            <div class="card">
+                <h3>Ajouter une campagne</h3>
 
-        <!-- TABLE -->
-        <div class="card">
-            <h3>Liste des campagnes</h3>
+                <form method="POST" action="/campagnes/add" class="form">
+                    <input name="nom" placeholder="Nom" required>
+                    <input name="statut" placeholder="Statut" required>
+                    <button type="submit">Ajouter</button>
+                </form>
+            </div>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
+            <!-- TABLE -->
+            <div class="card">
+                <h3>Liste des campagnes</h3>
 
-                <tbody>
-                    {% for c in campagnes %}
-                    <tr>
-                        <td>{{ c.nom }}</td>
-                        <td>{{ c.statut }}</td>
-                        <td>
-                            <button class="edit-btn"><a href="/campagnes/edit/{{ c.id }}">✏️ Modifier</a></button>
-                        </td> 
-                        <td>
-                            <form method="POST" action="/campagnes/delete/{{ c.id }}">
-                                <button type="submit" class="delete-btn"
-                                        onclick="return confirm('Supprimer cette campagne?')">
-                                    🗑 Supprimer
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
 
+                    <tbody>
+                        {% for c in campagnes %}
+                        <tr>
+                            <td>{{ c.nom }}</td>
+                            <td>{{ c.statut }}</td>
+                            <td>
+                                <button class="edit-btn"><a href="/campagnes/edit/{{ c.id }}">✏️ Modifier</a></button>
+                            </td> 
+                            <td>
+                                <form method="POST" action="/campagnes/delete/{{ c.id }}">
+                                    <button type="submit" class="delete-btn"
+                                            onclick="return confirm('Supprimer cette campagne?')">
+                                        🗑 Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
         </div>
-
     </main>
 
 </div>

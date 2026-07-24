@@ -180,53 +180,64 @@
                 </form>
             </div>
         </div>
-        <!-- FORMULAIRE -->
-        <div class="card">
-            <h3>Ajouter une zone</h3>
-
-            <form method="POST" action="/zones/add" class="form">
-                <input name="nom" placeholder="Nom" required>
-                <input name="nombre_pisteur" placeholder="Nombre de pisteurs" required>
-                <button type="submit">Ajouter</button>
-            </form>
+        <div class="stats-grid-client-pisteur">
+            <div class="stat-card">
+                <h4>Total Zones</h4>
+                <p>{{ zones|length }}</p>
+            </div>
+            <div class="stat-card green">
+                <h4>Zones avec campagnes</h4>
+                <p>{{ zones|length }}</p>
+            </div>
         </div>
+        <div class="settings-container">
+            <!-- FORMULAIRE -->
+            <div class="card">
+                <h3>Ajouter une zone</h3>
 
-        <!-- TABLE -->
-        <div class="card">
-            <h3>Liste des zones</h3>
+                <form method="POST" action="/zones/add" class="form">
+                    <input name="nom" placeholder="Nom" required>
+                    <input name="nombre_pisteur" placeholder="Nombre de pisteurs" required>
+                    <button type="submit">Ajouter</button>
+                </form>
+            </div>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Nombre de pisteurs</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
+            <!-- TABLE -->
+            <div class="card">
+                <h3>Liste des zones</h3>
 
-                <tbody>
-                    {% for c in zones %}
-                    <tr>
-                        <td>{{ c.nom }}</td>
-                        <td>{{ c.nombre_pisteur }}</td>
-                        <td>
-                            <button class="edit-btn"><a href="/zones/edit/{{ c.id }}">✏️ Modifier</a></button>
-                        </td> 
-                        <td>
-                            <form method="POST" action="/zones/delete/{{ c.id }}">
-                                <button type="submit" class="delete-btn"
-                                        onclick="return confirm('Supprimer cette zone ?')">
-                                    🗑 Supprimer
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Nombre de pisteurs</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
 
+                    <tbody>
+                        {% for c in zones %}
+                        <tr>
+                            <td>{{ c.nom }}</td>
+                            <td>{{ c.nombre_pisteur }}</td>
+                            <td>
+                                <button class="edit-btn"><a href="/zones/edit/{{ c.id }}">✏️ Modifier</a></button>
+                            </td> 
+                            <td>
+                                <form method="POST" action="/zones/delete/{{ c.id }}">
+                                    <button type="submit" class="delete-btn"
+                                            onclick="return confirm('Supprimer cette zone ?')">
+                                        🗑 Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
         </div>
-
     </main>
 
 </div>

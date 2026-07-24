@@ -180,48 +180,60 @@
                 </form>
             </div>
         </div>
-        <!-- FORMULAIRE -->
-        <div class="card">
-            <h3>Ajouter un produit</h3>
-
-            <form method="POST" action="/produits/add" class="form">
-                <input name="nom" placeholder="Nom" required>
-                <button type="submit">Ajouter</button>
-            </form>
+        <div class="stats-grid-client-pisteur">
+            <div class="stat-card">
+                <h4>Total Produits</h4>
+                <p>{{ produits|length }}</p>
+            </div>
+            <div class="stat-card green">
+                <h4>Produits avec campagnes</h4>
+                <p>{{ produits|length }}</p>
+            </div>
         </div>
+        <div class="settings-container">
+            <!-- FORMULAIRE -->
+            <div class="card">
+                <h3>Ajouter un produit</h3>
 
-        <!-- TABLE -->
-        <div class="card">
-            <h3>Liste des produits</h3>
+                <form method="POST" action="/produits/add" class="form">
+                    <input name="nom" placeholder="Nom" required>
+                    <button type="submit">Ajouter</button>
+                </form>
+            </div>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
+            <!-- TABLE -->
+            <div class="card">
+                <h3>Liste des produits</h3>
 
-                <tbody>
-                    {% for c in produits %}
-                    <tr>
-                        <td>{{ c.nom }}</td>
-                        <td>
-                            <button class="edit-btn"><a href="/produits/edit/{{ c.id }}">✏️ Modifier</a></button>
-                        </td> 
-                        <td>
-                            <form method="POST" action="/produits/delete/{{ c.id }}">
-                                <button type="submit" class="delete-btn"
-                                        onclick="return confirm('Supprimer ce produit?')">
-                                    🗑 Supprimer
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
 
+                    <tbody>
+                        {% for c in produits %}
+                        <tr>
+                            <td>{{ c.nom }}</td>
+                            <td>
+                                <button class="edit-btn"><a href="/produits/edit/{{ c.id }}">✏️ Modifier</a></button>
+                            </td> 
+                            <td>
+                                <form method="POST" action="/produits/delete/{{ c.id }}">
+                                    <button type="submit" class="delete-btn"
+                                            onclick="return confirm('Supprimer ce produit?')">
+                                        🗑 Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
         </div>
 
     </main>

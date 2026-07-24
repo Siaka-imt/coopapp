@@ -962,4 +962,79 @@ input:focus {
     color: #2d5f8a;
     font-weight: 500;
 }
+/* Table fiche mission*/
+.fiche-header {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+}
 
+.fiche-header h2 {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 22px;
+    margin-bottom: 30px;
+}
+
+.fiche-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 60px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+}
+
+.info-item {
+    display: flex;
+    gap: 10px;
+}
+
+.info-item strong {
+    color: #dba850;
+}
+
+.info-item select {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.campaign-stats {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+}
+
+.campaign-stats h3 {
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.campaign-stats .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+
+.campaign-stats .stat-card {
+    padding: 15px;
+    background: #f5f7f5;
+    border-radius: 10px;
+    border-left: 4px solid #d8993a;
+}
+
+.campaign-stats .stat-card span {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.campaign-stats .stat-card strong {
+    font-size: 18px;
+    color: #f9d07f;
+}
