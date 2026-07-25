@@ -147,6 +147,12 @@ body{
     margin-bottom: 10px;
 }
 
+.card select {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
 .card h3 {
     margin: 0;
 }
@@ -913,7 +919,7 @@ input:focus {
 
 .table-fiche-client td:nth-child(3),
 .table-fiche-client td:nth-child(8),
-.table-fiche-client td:nth-child(9),
+.table-fiche-client td:nth-child(10),
 .table-fiche-client td:nth-child(11),
 .table-fiche-client td:nth-child(12),
 .table-fiche-client td:nth-child(15) {
@@ -954,8 +960,8 @@ input:focus {
 }
 
 .table-fiche-pisteur td:nth-child(5),
-.table-fiche-pisteur td:nth-child(6),
 .table-fiche-pisteur td:nth-child(7),
+.table-fiche-pisteur td:nth-child(8),
 .table-fiche-pisteur td:nth-child(9),
 .table-fiche-pisteur td:nth-child(10),
 .table-fiche-pisteur td:nth-child(13) {
@@ -1002,6 +1008,7 @@ input:focus {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 .campaign-stats {
     background: white;
     padding: 20px;

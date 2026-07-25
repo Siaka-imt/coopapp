@@ -180,57 +180,62 @@
                 </form>
             </div>
         </div>
-        <!-- FORMULAIRE -->
-        <div class="card">
-            <h3>Ajouter un utilisateur</h3>
+        <div class="settings-container">
+            <!-- FORMULAIRE -->
+            <div class="card">
+                <h3>Ajouter un utilisateur</h3>
 
-            <form method="POST" action="/users/add" class="form">
-                <input name="username" placeholder="Nom d'utilisateur" required>
-                <input name="email" placeholder="Email" required>
-                <input name="password" placeholder="Mot de passe" required>
-                <input name="role" placeholder="Rôle" required>
-                <button type="submit">Ajouter</button>
-            </form>
+                <form method="POST" action="/users/add" class="form">
+                    <input name="username" placeholder="Nom d'utilisateur" required>
+                    <input name="email" placeholder="Email" required>
+                    <input name="password" placeholder="Mot de passe" required>
+                    <select name="role" required>
+                        <option value="" disabled selected>Choisir un rôle</option>
+                        <option value="Admin">Administrateur</option>
+                        <option value="Employé">Employé</option>
+                    </select>
+                    <button type="submit">Ajouter</button>
+                </form>
+            </div>
+
+            <!-- TABLE -->
+            <div class="card">
+                <h3>Liste des utilisateurs</h3>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for c in users %}
+                        <tr>
+                            <td>{{ c.username }}</td>
+                            <td>{{ c.email }}</td>
+                            <td>{{ c.role }}</td>
+                            <td>
+                                <button class="edit-btn"><a href="/users/edit/{{ c.id }}">✏️ Modifier</a></button>
+                            </td> 
+                            <td>
+                                <form method="POST" action="/users/delete/{{ c.id }}">
+                                    <button type="submit" class="delete-btn"
+                                            onclick="return confirm('Supprimer cet utilisateur ?')">
+                                        🗑 Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
         </div>
-
-        <!-- TABLE -->
-        <div class="card">
-            <h3>Liste des utilisateurs</h3>
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Email</th>
-                        <th>Rôle</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for c in users %}
-                    <tr>
-                        <td>{{ c.username }}</td>
-                        <td>{{ c.email }}</td>
-                        <td>{{ c.role }}</td>
-                        <td>
-                            <button class="edit-btn"><a href="/users/edit/{{ c.id }}">✏️ Modifier</a></button>
-                        </td> 
-                        <td>
-                            <form method="POST" action="/users/delete/{{ c.id }}">
-                                <button type="submit" class="delete-btn"
-                                        onclick="return confirm('Supprimer cet utilisateur ?')">
-                                    🗑 Supprimer
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-        </div>
-
     </main>
 
 </div>

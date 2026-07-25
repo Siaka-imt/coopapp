@@ -112,7 +112,7 @@ def recalculate_fiche_pisteur(pisteur, campagne):
         credit_cumul += clean_number(credit)
 
         # solde
-        solde = clean_number(credit_cumul) - clean_number(debit_cumul)
+        solde = clean_number(debit_cumul) - clean_number(credit_cumul)
 
         # sacs
         sac_restant += clean_number(sac_recu) - clean_number(sac_livre)
@@ -1305,8 +1305,8 @@ def update_fiche_pisteur(id):
     prix = int(request.form["prix"])
     poids_net = int(request.form["poids_net"])
 
-    #debit = int(request.form["debit"])
-    credit = int(request.form["credit"])
+    debit = int(request.form["debit"])
+    #credit = int(request.form["credit"])
 
     sac_reçu = int(request.form["sac_reçu"])
     sac_livre = int(request.form["sac_livre"])
@@ -1324,7 +1324,7 @@ def update_fiche_pisteur(id):
         return "Fiche introuvable", 404
 
     pisteur_nom = result["pisteur"]
-    debit = clean_number(poids_net) * clean_number(prix)
+    credit = clean_number(poids_net) * clean_number(prix)
 
     cursor.execute("""
             UPDATE fiche_pisteur
@@ -1348,7 +1348,7 @@ def add_fiche_pisteur():
     prix = request.form["prix"]
     poids_net = request.form["poids_net"]
 
-    credit = request.form["credit"]
+    debit = request.form["debit"]
 
     sac_recu = request.form["sac_reçu"]
     sac_livre = request.form["sac_livre"]
@@ -1388,7 +1388,7 @@ def add_fiche_pisteur():
     # =========================
     # CALCULS AUTOMATIQUES
     # =========================
-    debit = clean_number(poids_net) * clean_number(prix)
+    credit = clean_number(poids_net) * clean_number(prix)
 
     poids_cumul = clean_number(last_poids) + clean_number(poids_net)
 
@@ -1396,7 +1396,7 @@ def add_fiche_pisteur():
 
     credit_cumul = clean_number(last_credit) + clean_number(credit)
 
-    solde = credit_cumul - debit_cumul
+    solde = debit_cumul - credit_cumul
 
     sac_restant = clean_number(last_sac) + clean_number(sac_recu) - clean_number(sac_livre)
 

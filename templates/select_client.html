@@ -263,16 +263,16 @@
 
             <form method="POST" action="/clients/fiche_clients/add" class="form">
                 <input name="client" value="{{ nom_client }}" placeholder="Réecrivez le nom SVP !" required>
+                <input type="date" name="date" placeholder="Date" required>
                 <input name="montant" placeholder="Montant" required>
-                <input name="date" placeholder="Date" required>
-                <input name="date_dechargement" placeholder="Date dechargement" required>
-                <input name="numero_camion" placeholder="Numero camion" required>
-                <input name="numero_fiche" placeholder="Numero fiche" required>
-                <input name="poids_net" placeholder="Poids net" required>
-                <input name="prix" placeholder="Prix" required>
-                <input name="sac_reçu" placeholder="Sac reçu" required>
-                <input name="sac_livre" placeholder="Sac livre" required>
-                <input name="campagne" value="{{ campagne_selected}}"placeholder="Campagne" required>
+                <input type="date" name="date_dechargement" placeholder="Date dechargement">
+                <input name="numero_camion" placeholder="Numero camion" >
+                <input name="numero_fiche" placeholder="Numero fiche" >
+                <input name="poids_net" value = "{{ 0 }}" placeholder="Poids net" required>
+                <input name="prix" value = "{{ 0 }}" placeholder="Prix" required>
+                <input name="sac_reçu" value = "{{ 0 }}" placeholder="Sac reçu" required>
+                <input name="sac_livre" value = "{{ 0 }}" placeholder="Sac livre" required>
+                <input name="campagne" value = "{{ campagne_selected or '' }}" placeholder="Campagne" required>
                 <button type="submit">Ajouter</button>
             </form>
         </div>

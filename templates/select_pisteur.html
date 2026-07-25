@@ -232,12 +232,12 @@
                 </div>
 
                 <div class="stat-card">
-                    <span>Cumul Débit</span>
+                    <span>Cumul Financement</span>
                     <strong>{{ format_number_after(format_number(totals.debit)) }} FCFA</strong>
                 </div>
 
                 <div class="stat-card">
-                    <span>Cumul Crédit</span>
+                    <span>Cumul Valeurs Livraisons</span>
                     <strong>{{ format_number_after(format_number(totals.credit)) }} FCFA</strong>
                 </div>
 
@@ -260,13 +260,17 @@
 
             <form method="POST" action="/pisteurs/fiche_pisteur/add" class="form">
                 <input name="pisteur" value="{{ nom_pisteur }}" placeholder="Réecrivez le nom SVP !" required>
-                <input name="date" placeholder="Date" required>
-                <input name="prix" placeholder="Prix" required>
-                <input name="poids_net" placeholder="Poids net" required>
-                <input name="credit" placeholder="Credit" required>
-                <input name="sac_reçu" placeholder="Sac reçu" required>
-                <input name="sac_livre" placeholder="Sac livre" required>
-                <input name="detail" placeholder="Detail" required>
+                <input type="date" name="date" placeholder="Date" required>
+                <input name="prix" value = "{{ 0 }}" placeholder="Prix" required>
+                <input name="poids_net" value = "{{ 0 }}" placeholder="Poids net" required>
+                <input name="debit" value = "{{ 0 }}" placeholder="Financement" required>
+                <input name="sac_reçu" value = "{{ 0 }}" placeholder="Sac reçu" required>
+                <input name="sac_livre" value = "{{ 0 }}" placeholder="Sac livre" required>
+                <select name="detail" required>
+                    <option value="" disabled selected>Choisir un détail</option>
+                    <option value="FINANCEMENT">FINANCEMENT</option>
+                    <option value="LIVRAISON">LIVRAISON</option>
+                </select>
                 <input name="campagne" value="{{ campagne_selected}}" placeholder="Campagne" required>
                 <button type="submit">Ajouter</button>
             </form>
@@ -284,10 +288,10 @@
                         <th>Prix</th>
                         <th>Poids net</th>
                         <th>Cumul Poids Net</th>
-                        <th>Debit</th>
-                        <th>Cumul debit</th>
-                        <th>Credit</th>
-                        <th>Cumul credit</th>
+                        <th>Financement</th>
+                        <th>Cumul Financement</th>
+                        <th>Valeurs Livrees</th>
+                        <th>Cumul Valeurs Livrees</th>
                         <th>solde</th>
                         <th>Sac reçu</th>
                         <th>Sac livre</th>
