@@ -27,6 +27,10 @@
                     <input name="date_dechargement" value="{{ client.date_dechargement }}">
                 </div>
                 <div class="form-row">
+                    <label>Montant</label>
+                    <input name="montant" value="{{ client.montant }}">
+                </div>
+                <div class="form-row">
                     <label>Numero camion</label>
                     <input name="numero_camion" value="{{ client.numero_camion }}">
                 </div>
@@ -58,7 +62,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="edit-btn">💾 Enregistrer</button>
-                <a href="/clients" class="cancel-btn">Annuler</a>
+                <a href="/clients/select/{{ client.client}}" class="cancel-btn">Annuler</a>
             </div>
 
         </form>

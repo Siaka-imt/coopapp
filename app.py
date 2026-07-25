@@ -103,25 +103,25 @@ def recalculate_fiche_pisteur(pisteur, campagne):
         sac_livre = row["sac_livre"] or 0
 
         # cumul poids
-        poids_cumul += poids_net
+        poids_cumul += clean_number(poids_net)
 
         # cumul débit
-        debit_cumul += debit
+        debit_cumul += clean_number(debit)
 
         # cumul crédit
-        credit_cumul += credit
+        credit_cumul += clean_number(credit)
 
         # solde
-        solde = credit_cumul - debit_cumul
+        solde = clean_number(credit_cumul) - clean_number(debit_cumul)
 
         # sacs
-        sac_restant += sac_recu - sac_livre
+        sac_restant += clean_number(sac_recu) - clean_number(sac_livre)
 
         # 🔥 UPDATE
         cursor.execute("""
             UPDATE fiche_pisteur
             SET
-                cumul_poids_net = %s,
+                poids_cumul = %s,
                 debit_cumul = %s,
                 credit_cumul = %s,
                 solde = %s,
@@ -676,7 +676,7 @@ def select_client(nom):
         "select_client.html",
         nom_client = nom, campagnes = campagnes, campagne_selected = campagne_selected, client_info = client_info, totals=totals, client_select = client_fiche, user = session["user"],
         role = session["role"], format_number=format_number, format_number_after=format_number_after, photo=user_photo["photo"] if user_photo else None)
-@app.route("/clientS/<nom>")
+@app.route("/clients/<nom>")
 def voir_client(nom):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -716,7 +716,7 @@ def delete_client_fiche(id):
     cursor.close()
     conn.close()
     flash("Fiche Client supprimée avec succès ✅", "success")
-    return redirect(url_for("voir_client", nom = client_nom))
+    return redirect(url_for("select_client", nom = client_nom))
 
 @app.route("/clients/edit_fiche/<int:id>", methods = ["GET"])
 def edit_fiche_client(id):
@@ -749,7 +749,7 @@ def update_fiche_client(id):
     if result is None:
         return "Fiche introuvable", 404
 
-    client_nom = result[0]
+    client_nom = result["client"]
 
     montant_livraison = clean_number(poids_net) * clean_number(prix)
 
@@ -766,7 +766,7 @@ def update_fiche_client(id):
     conn.commit()
     recalculate_fiche_client(client_nom, campagne)
     flash("Fiche Client modifiée avec succès ✅", "success")
-    return redirect(url_for("voir_client", nom=client_nom))
+    return redirect(url_for("select_client", nom = client_nom))
 @app.route("/clients/fiche_clients/add", methods=["POST"])
 def add_fiche_client():
     nom = request.form["client"]
@@ -832,7 +832,7 @@ def add_fiche_client():
             sac_restant,montant, campagne))
 
     conn.commit()
-    return redirect(url_for("voir_client", nom = nom))
+    return redirect(url_for("select_client", nom = nom))
 @app.route("/clients/export/excel")
 def export_clients_excel():
 
@@ -1287,7 +1287,7 @@ def delete_pisteur_fiche(id):
     cursor.close()
     conn.close()
     flash("Fiche Pisteur supprimée avec succès ✅", "success")
-    return redirect(url_for("voir_pisteur", nom=pisteur_nom))
+    return redirect(url_for("select_pisteur", nom=pisteur_nom))
 
 @app.route("/pisteurs/edit_fiche/<int:id>", methods=["GET"])
 def edit_fiche_pisteur(id):
@@ -1323,7 +1323,7 @@ def update_fiche_pisteur(id):
     if result is None:
         return "Fiche introuvable", 404
 
-    pisteur_nom = result[0]
+    pisteur_nom = result["pisteur"]
     debit = clean_number(poids_net) * clean_number(prix)
 
     cursor.execute("""
@@ -1338,7 +1338,7 @@ def update_fiche_pisteur(id):
     conn.commit()
     recalculate_fiche_pisteur(pisteur_nom, campagne)
     flash("Fiche Pisteur modifiée avec succès ✅", "success")
-    return redirect(url_for("voir_pisteur", nom = pisteur_nom))
+    return redirect(url_for("select_pisteur", nom = pisteur_nom))
 
 @app.route("/pisteurs/fiche_pisteur/add", methods = ["POST"])
 def add_fiche_pisteur():
@@ -1415,7 +1415,7 @@ def add_fiche_pisteur():
 
     flash("Fiche ajoutée avec succès ✅", "success")
 
-    return redirect(url_for("voir_pisteur", nom=pisteur))
+    return redirect(url_for("select_pisteur", nom=pisteur))
 @app.route("/pisteurs/export/excel")
 def export_pisteurs_excel():
 

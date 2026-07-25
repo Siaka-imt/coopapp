@@ -23,6 +23,10 @@
                     <input name="date" value="{{ pisteur.date }}">
                 </div>
                 <div class="form-row">
+                    <label>Detail</label>
+                    <input name="detail" value="{{ pisteur.detail }}">
+                </div>
+                <div class="form-row">
                     <label>Prix</label>
                     <input name="prix" value="{{ pisteur.prix }}">
                 </div>
@@ -42,11 +46,15 @@
                     <label>Sac livre</label>
                     <input name="sac_livre" value="{{ pisteur.sac_livre }}">
                 </div>
+                <div class="form-row">
+                    <label>Campagne</label>
+                    <input name="campagne" value="{{ pisteur.campagne }}">
+                </div>
             </div>
 
             <div class="form-actions">
                 <button type="submit" class="edit-btn">💾 Enregistrer</button>
-                <a href="/pisteurs" class="cancel-btn">Annuler</a>
+                <a href="/pisteurs/select/{{ pisteur.pisteur }}" class="cancel-btn"> Annuler </a>
             </div>
 
         </form>

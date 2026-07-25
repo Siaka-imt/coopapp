@@ -233,7 +233,7 @@
 
                 <div class="stat-card">
                     <span>Cumul Débit</span>
-                    <strong>{{ format_number_after(format_number(totals.debit)) }} Kg</strong>
+                    <strong>{{ format_number_after(format_number(totals.debit)) }} FCFA</strong>
                 </div>
 
                 <div class="stat-card">
@@ -267,7 +267,7 @@
                 <input name="sac_reçu" placeholder="Sac reçu" required>
                 <input name="sac_livre" placeholder="Sac livre" required>
                 <input name="detail" placeholder="Detail" required>
-                <input name="campagne" placeholder="Campagne" required>
+                <input name="campagne" value="{{ campagne_selected}}" placeholder="Campagne" required>
                 <button type="submit">Ajouter</button>
             </form>
         </div>
