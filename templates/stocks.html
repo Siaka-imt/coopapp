@@ -293,20 +293,20 @@
             <div class="card">
                 <h3>Ajouter un mouvement</h3>
 
-                <form method="POST" action="/stocks/add" class="form">
-                    <input type="date" name="created_at" placeholder="Date du jour" required>
-                    <input name="produit" placeholder="Produit" required>
-                    <select name="type_mouvement" required>
-                        <option value="" disabled selected>Choisir un mouvement</option>
-                        <option value="ENTREE">ENTREE</option>
-                        <option value="SORTIE">SORTIE</option>
-                    </select>
-                    <input type="date" name="date_mouvement" placeholder="Date Entrée/Sortie" required>
-                    <input name="quantite_poids" placeholder="Poids (kg)" required>
-                    <input name="nombre_sacs" placeholder="Nombre sacs" required>
-                    <input name="campagne" placeholder="Campagne" required>
-                    <button type="submit">Enregistrer</button>
-                </form>
+                    <form method="POST" action="/stocks/add" class="form">
+                        <input type="date" name="created_at" placeholder="Date du jour" required>
+                        <input name="produit" placeholder="Produit" required>
+                        <select name="type_mouvement" required>
+                            <option value="" disabled selected>Choisir un mouvement</option>
+                            <option value="ENTREE">ENTREE</option>
+                            <option value="SORTIE">SORTIE</option>
+                        </select>
+                        <input type="date" name="date_mouvement" placeholder="Date Entrée/Sortie" required>
+                        <input name="quantite_poids" placeholder="Poids (kg)" required>
+                        <input name="nombre_sacs" placeholder="Nombre sacs" required>
+                        <input name="campagne" placeholder="Campagne" required>
+                        <button type="submit">Enregistrer</button>
+                    </form>
             </div>
             <div class="card filter-card">
 
