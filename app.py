@@ -1416,7 +1416,7 @@ def add_fiche_pisteur():
 
     flash("Fiche ajoutée avec succès ✅", "success")
 
-    return redirect(url_for("select_pisteur", nom=pisteur))
+    return redirect(url_for("select_pisteur", nom = pisteur))
 @app.route("/pisteurs/export/excel")
 def export_pisteurs_excel():
 
@@ -2222,49 +2222,155 @@ def export_produits_pdf():
 def stocks():
     if "user" not in session:
         return redirect("/")
+    
     search = request.args.get("search", "").strip()
+    campagne_selected = request.args.get("campagne", "")
+    produit_selected = request.args.get("produit", "")
+
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered = True)
+
+    # =====================================================
+    # 1. Historique des mouvements
+    # =====================================================
+    query = """ SELECT * FROM mouvement_stock WHERE 1=1"""
+    params = []
+
     if search:
-        cursor.execute("""
-            SELECT *
-            FROM mouvement_stock
-            WHERE campagne LIKE %s
-            ORDER BY campagne
-        """, (f"%{search}%",))
-    else:
-        cursor.execute("""
-            SELECT *
-            FROM mouvement_stock
-            ORDER BY campagne
-        """)
+        query += " AND (produit LIKE %s OR campagne LIKE %s)"
+        params.extend([
+            f"%{search}"
+            f"%{search}"
+        ])
+    if campagne_selected:
+        query += " AND campagne =%s"
+        params.append(campagne_selected)
+    if produit_selected:
+        query += " AND produit = %s"
+        params.append(produit_selected)
+
+    query += " ORDER BY date_mouvement DESC"
+
+    cursor.execute(query, params)
     data = cursor.fetchall()
+
+    # =====================================================
+    # 2. Résumé actuel des stocks
+    # =====================================================
+    
+    query_stock = """ 
+        SELECT produit, campagne, 
+            SUM( 
+                CASE
+                    WHEN type_mouvement = 'ENTREE'
+                    THEN quantite_poids
+                    ELSE 0
+                END
+            ) AS total_entree_poids,
+            SUM(
+                CASE
+                    WHEN type_mouvement = 'SORTIE'
+                    THEN quantite_poids
+                    ELSE 0
+                END
+            )AS total_sortie_poids,
+            SUM(
+                CASE
+                    WHEN type_mouvement = 'SORTIE'
+                    THEN nombre_sacs
+                    ELSE 0
+                END
+            ) AS total_entree_sacs,
+            SUM(
+                CASE 
+                    WHEN type_mouvement = 'SORTIE'
+                    THEN nombre_sacs
+                    ELSE 0
+                END
+            ) AS total_sortie_sacs
+
+        FROM mouvement_stock
+        GROUP BY produit, campagne
+        ORDER BY campagne, produit
+    """
+    cursor.execute(query_stock)
+    stock_summary = cursor.fetchall()
+
+    # =====================================================
+    # 3. Calcul du stock disponible
+    # =====================================================
+    for stock in stock_summary :
+        stock["stock_poids"] = (
+            (stock["total_entree_poids"] or 0) - (stock["total_sortie_poids"] or 0)
+        )
+        stock["stock_sacs"] = (
+            (stock["total_entree_sacs"] or 0) - (stock["total_sortie_sacs"] or 0)
+        )
+
+    # =====================================================
+    # 4. Campagnes disponibles
+    # =====================================================
+    cursor.execute("""
+        SELECT DISTINCT campagne 
+        FROM mouvement_stock
+        ORDER BY campagne DESC
+    """)
+    campagnes = cursor.fetchall()
+
+    # =====================================================
+    # ! Stock dispo
+    # =====================================================
+    total_poids_stock = sum(
+        stock["stock_poids"] or 0
+        for stock in stock_summary
+    )
+
+    total_sacs_stock = sum(
+        stock["stock_sacs"] or 0
+        for stock in stock_summary
+    )
+
+    total_produits = len(stock_summary)
+
+    # =====================================================
+    # 5. Produits disponibles
+    # =====================================================
+    cursor.execute("""
+        SELECT DISTINCT produit
+        FROM mouvement_stock
+        ORDER BY produit
+    """)
+    produits = cursor.fetchall()
+
+    # =====================================================
+    # 6. Photo utilisateur
+    # =====================================================
     cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
     user_photo = cursor.fetchone()
-    return render_template("stocks.html", produits=data, user=session["user"],
-        role=session["role"], photo = user_photo["photo"] if user_photo else None)
+
+    return render_template("stocks.html", stocks = data, stock_summary = stock_summary, total_poids_stock = total_poids_stock, total_sacs_stock = total_sacs_stock, total_produits = total_produits, campagnes = campagnes, user = session["user"],
+        role = session["role"], produits = produits, campagne_selected = campagne_selected, produit_selected = produit_selected, photo = user_photo["photo"] if user_photo else None)
 @app.route("/stocks/add", methods=["POST"])
 def add_stock():
+    created_at = request.form["created_at"]
     produit = request.form["produit"]
     type_mouvement = request.form["type_mouvement"]
+    date_mouvement = request.form["date_mouvement"]
     quantite_poids = request.form["quantite_poids"]
     nombre_sacs = request.form["nombre_sacs"]
-    date_mouvement = request.form["date_mouvement"]
     campagne = request.form["campagne"]
-    motif = request.form["motif"]
-    commentaire = request.form["commentaire"]
-    create_at = request.form["create_at"]
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO mouvement_stocks (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement," \
-        "campagne, motif, commentaire, create_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-        (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement, campagne, motif, commentaire, create_at )
+        "INSERT INTO mouvement_stock (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement," \
+        "campagne, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement, campagne, created_at )
     )
     conn.commit()
-    return redirect("/stocks")
+    flash("Ligne ajoutée avec succès ✅", "success")
+    return redirect(url_for("stocks"))
 @app.route("/stocks/delete/<int:id>", methods=["POST"])
 def delete_stock(id):
     conn = get_db_connection()
@@ -2281,9 +2387,9 @@ def edit_stock(id):
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("SELECT * FROM mouvement_stock WHERE id = %s", (id,))
-    stocks = cursor.fetchone()
+    stock = cursor.fetchone()
 
-    return render_template("edit_stock.html", stocks=stocks)
+    return render_template("edit_stock.html", stock = stock)
 @app.route("/stocks/update/<int:id>", methods=["POST"])
 def update_stock(id):
     produit = request.form["produit"]
@@ -2292,9 +2398,7 @@ def update_stock(id):
     nombre_sacs = request.form["nombre_sacs"]
     date_mouvement = request.form["date_mouvement"]
     campagne = request.form["campagne"]
-    motif = request.form["motif"]
-    commentaire = request.form["commentaire"]
-    create_at = request.form["create_at"]
+    created_at = request.form["created_at"]
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -2302,14 +2406,14 @@ def update_stock(id):
     cursor.execute("""
         UPDATE mouvement_stock
         SET produit = %s, type_mouvement = %s, quantite_poids = %s, nombre_sacs = %s,
-        date_mouvement = %s, campagne = %s, motif = %s, commentaire = %s, create_at = %s 
+        date_mouvement = %s, campagne = %s, created_at = %s 
         WHERE id = %s
     """, (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement, campagne,
-          motif, commentaire, create_at, id))
+        created_at, id))
 
     conn.commit()
     flash("Ligne modifiée avec succès ✅", "success")
-    return redirect("/stocks")
+    return redirect(url_for("stocks"))
 #----------------------------------------------------------------
 # Routes campagnes
 #----------------------------------------------------------------
@@ -2349,7 +2453,7 @@ def add_campagne():
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO campagne (nom, statut) VALUES (%s,%s)",
+        "INSERT INTO campagne (nom, statut) VALUES (%s, %s)",
         (nom,statut)
     )
     conn.commit()

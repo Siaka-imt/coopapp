@@ -15,57 +15,44 @@
         <h2>✏️ Modifier un stock</h2>
         <p class="subtitle">Modifiez les informations</p>
 
-        <form method="POST" action="/stokcs/update/{{ stock.id }}" 
+        <form method="POST" action="/stocks/update/{{ stock.id }}" 
       onsubmit="return confirm('Confirmer la modification ?')">
             <div class="form-group">
                 <div class="form-row">
+                    <label>Date du jour</label>
+                    <input name="created_at" type = "date" value="{{ stock.created_at }}">
+                </div>
+                <div class="form-row">
                     <label>Nom du produit</label>
-                    <input name="produit" value="{{ stocks.produit }}">
+                    <input name="produit" value="{{ stock.produit }}">
                 </div>
                 <div class="form-row">
                     <label>Type de mouvement</label>
-                    <input name="type_mouvement" value="{{ stocks.type_mouvement }}">
+                    <input name="type_mouvement" value="{{ stock.type_mouvement }}">
+                </div>
+                <div class="form-row">
+                    <label>Date Entrée/Sortie</label>
+                    <input name="date_mouvement" type = "date" value="{{ stock.date_mouvement }}">
                 </div>
                 <div class="form-row">
                     <label>Quantite Poids</label>
-                    <input name="quantite_poids" value="{{ stocks.quantite_poids }}">
+                    <input name="quantite_poids" value="{{ stock.quantite_poids }}">
                 </div>
                 <div class="form-row">
                     <label>Nombre sacs</label>
-                    <input name="nombre_sacs" value="{{ stocks.nombre_sacs }}">
-                </div>
-                <div class="form-row">
-                    <label>Date mouvement</label>
-                    <input name="date_mouvement" value="{{ stocks.date_mouvement }}">
+                    <input name="nombre_sacs" value="{{ stock.nombre_sacs }}">
                 </div>
                 <div class="form-row">
                     <label>Campagne</label>
-                    <input name="campagne" value="{{ stocks.campagne }}">
-                </div>
-                <div class="form-row">
-                    <label>Motif</label>
-                    <input name="motif" value="{{ stocks.motif }}">
-                </div>
-                <div class="form-row">
-                    <label>Commentaire</label>
-                    <input name="commentaire" value="{{ stocks.commentaire }}">
-                </div>
-                <div class="form-row">
-                    <label>Date de creation</label>
-                    <input name="create_at" value="{{ stocks.create_at }}">
+                    <input name="campagne" value="{{ stock.campagne }}">
                 </div>
             </div>
-
             <div class="form-actions">
                 <button type="submit" class="edit-btn">💾 Enregistrer</button>
                 <a href="/stocks" class="cancel-btn">Annuler</a>
             </div>
-
         </form>
-
     </div>
-
 </div>
-
 </body>
 </html>

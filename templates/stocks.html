@@ -126,7 +126,7 @@
 
             <div class="header-left">
                 <h1>Stocks</h1>
-                <p>Gestion des stocks</p>
+                <p>Gestion des stocks de produits</p>
             </div>
 
             <div class="header-center">
@@ -186,54 +186,189 @@
                 </form>
             </div>
         </div>
-        <div class="stats-grid-client-pisteur">
-            <div class="stat-card green">
-                <h4>Stocks Total</h4>
-                <p>{{ stocks|length }}</p>
-            </div>
+        <div class="stats-grid-stock">
+
             <div class="stat-card">
-                <h4>Total sacs</h4>
-                <p>{{ sacs|length }}</p>
+                <h4>Produits suivis</h4>
+                <p>{{ total_produits }}</p>
             </div>
+
+            <div class="stat-card green">
+                <h4>Poids total en stock</h4>
+                <p>
+                    {{ total_poids_stock }} Kg
+                </p>
+            </div>
+
+            <div class="stat-card">
+                <h4>Total sacs en stock</h4>
+                <p>
+                    {{ total_sacs_stock }}
+                </p>
+            </div>
+
         </div>
+        <div class="card stock-summary-card">
+
+            <h3>État actuel des stocks</h3>
+
+            <div class="table-container">
+
+                <table class="table stock-summary-table">
+
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Campagne</th>
+                            <th>Entrées (Kg)</th>
+                            <th>Sorties (Kg)</th>
+                            <th>Stock disponible (Kg)</th>
+                            <th>Entrées (Sacs)</th>
+                            <th>Sorties (Sacs)</th>
+                            <th>Sacs disponibles</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for stock in stock_summary %}
+
+                        <tr>
+
+                            <td>{{ stock.produit }}</td>
+
+                            <td>{{ stock.campagne }}</td>
+
+                            <td>
+                                {{ stock.total_entree_poids or 0 }}
+                            </td>
+
+                            <td>
+                                {{ stock.total_sortie_poids or 0 }}
+                            </td>
+
+                            <td class="stock-value">
+                                <strong>
+                                    {{ stock.stock_poids }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ stock.total_entree_sacs or 0 }}
+                            </td>
+
+                            <td>
+                                {{ stock.total_sortie_sacs or 0 }}
+                            </td>
+
+                            <td class="stock-value">
+                                <strong>
+                                    {{ stock.stock_sacs }}
+                                </strong>
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+                            <td colspan="8">
+                                Aucun stock enregistré.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+        
         <div class="settings-container">
             <!-- FORMULAIRE -->
             <div class="card">
                 <h3>Ajouter un mouvement</h3>
 
                 <form method="POST" action="/stocks/add" class="form">
+                    <input type="date" name="created_at" placeholder="Date du jour" required>
                     <input name="produit" placeholder="Produit" required>
                     <select name="type_mouvement" required>
                         <option value="" disabled selected>Choisir un mouvement</option>
-                        <option value="Entrée">Entrée</option>
-                        <option value="Sortie">Sortie</option>
+                        <option value="ENTREE">ENTREE</option>
+                        <option value="SORTIE">SORTIE</option>
                     </select>
+                    <input type="date" name="date_mouvement" placeholder="Date Entrée/Sortie" required>
                     <input name="quantite_poids" placeholder="Poids (kg)" required>
                     <input name="nombre_sacs" placeholder="Nombre sacs" required>
-                    <input name="date_mouvement" placeholder="Date" required>
                     <input name="campagne" placeholder="Campagne" required>
-                    <input name="motif" placeholder="Motif" required>
-                    <input name="commentaire" placeholder="Commentaire" required>
-                    <input name="create_at" placeholder="Date de creation" required>
                     <button type="submit">Enregistrer</button>
                 </form>
             </div>
+            <div class="card filter-card">
 
+                <h3>🔎 Filtrer les mouvements</h3>
+
+                <form method="GET" action="/stocks" class="stock-filter">
+
+                    <select name="produit">
+                        <option value="">Tous les produits</option>
+
+                        {% for p in produits %}
+                            <option value="{{ p.produit }}"
+                                {% if produit_selected == p.produit %}selected{% endif %}>
+                                {{ p.produit }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="campagne">
+                        <option value="">Toutes les campagnes</option>
+
+                        {% for c in campagnes %}
+                            <option value="{{ c.campagne }}"
+                                {% if campagne_selected == c.campagne %}selected{% endif %}>
+                                {{ c.campagne }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="type">
+                        <option value="">Tous les mouvements</option>
+                        <option value="ENTREE">ENTREE</option>
+                        <option value="SORTIE">SORTIE</option>
+                    </select>
+
+                    <input type="date" name="date_debut">
+
+                    <input type="date" name="date_fin">
+
+                    <button type="submit" class="filter-btn">
+                        Filtrer
+                    </button>
+
+                    <a href="/stocks" class="reset-btn">
+                        Réinitialiser
+                    </a>
+
+                </form>
+
+            </div>
             <!-- TABLE -->
             <div class="card">
 
                 <table class="table">
                     <thead>
                         <tr class="table-group-header">
+                            <th>Date du jour</th>
                             <th>Produit</th>
                             <th>Type de mouvement</th>
+                            <th>Date Entrée/Sortie</th>
                             <th>Qté poids</th>
                             <th>Nombre sacs</th>
-                            <th>Date de mouvement</th>
                             <th>Campagne</th>
-                            <th>Motif</th>
-                            <th>Commentaire</th>
-                            <th>Date de creation</th>
                             <th>Modifier</th>
                             <th>Supprimer</th>
                         </tr>
@@ -242,16 +377,13 @@
                     <tbody>
                         {% for c in stocks %}
                         <tr>
+                            <td>{{ c.created_at }}</td>
                             <td>{{ c.produit }}</td>
                             <td>{{ c.type_mouvement }}</td>
+                            <td>{{ c.date_mouvement }}</td>
                             <td>{{ c.quantite_poids }}</td>
                             <td>{{ c.nombre_sacs }}</td>
-                            <td>{{ c.date_mouvement }}</td>
                             <td>{{ c.campagne }}</td>
-                            <td>{{ c.motif }}</td>
-                            <td>{{ c.commentaire }}</td>
-                            <td>{{ c.create_at }}</td>
-                            <td>{{ c.commentaire }}</td>
                             <td>
                                 <button class="edit-btn"><a href="/stocks/edit/{{ c.id }}">✏️ Modifier</a></button>
                             </td> 

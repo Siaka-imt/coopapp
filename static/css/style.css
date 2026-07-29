@@ -848,7 +848,12 @@ input:focus {
     gap: 25px;
     margin: 25px 0;
 }
-
+.stats-grid-stock {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(250px, 1fr));
+    gap: 25px;
+    margin: 25px 0;
+}
 .stat-card-client-pisteur {
     background: white;
     padding: 25px;
@@ -1055,4 +1060,210 @@ input:focus {
 .campaign-stats .stat-card strong {
     font-size: 18px;
     color: #f9d07f;
+}
+
+/* ===========================
+   SECTION STOCKS
+=========================== */
+
+.stock-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+    gap: 25px;
+    margin: 25px 0;
+}
+
+.stock-card{
+    background:#fff;
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+    transition:.25s;
+}
+
+.stock-card:hover{
+    transform:translateY(-3px);
+}
+
+.stock-card h4{
+    font-size:15px;
+    color:#777;
+    margin-bottom:10px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.stock-card p{
+    font-size:34px;
+    font-weight:bold;
+    color:#222;
+}
+
+.stock-card.green{
+    border-left:6px solid #27ae60;
+}
+
+.stock-card.orange{
+    border-left:6px solid #f39c12;
+}
+
+.stock-card.blue{
+    border-left:6px solid #3498db;
+}
+
+.stock-card.red{
+    border-left:6px solid #e74c3c;
+}
+
+/* ===========================
+   FILTRE
+=========================== */
+
+.stock-filter{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:25px;
+    display:flex;
+    gap:20px;
+    align-items:center;
+    flex-wrap:wrap;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.stock-filter select,
+.stock-filter input{
+
+    padding:12px 15px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    min-width:220px;
+    font-size:15px;
+}
+
+.stock-filter button{
+
+    background:#ff8c2a;
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.stock-filter button:hover{
+    background:#e67e22;
+}
+
+/* ===========================
+   FORMULAIRE
+=========================== */
+
+.stock-form{
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+}
+
+.stock-form input,
+.stock-form select{
+
+    padding:13px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:15px;
+}
+
+.stock-form button{
+
+    background:#182033;
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:13px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.stock-form button:hover{
+
+    background:#0f1627;
+}
+
+/* ===========================
+   TABLEAU
+=========================== */
+
+.table-container{
+
+    overflow-x:auto;
+    margin-top:20px;
+}
+
+.stock-table{
+
+    width:100%;
+    min-width:1300px;
+    border-collapse:collapse;
+    background:white;
+}
+
+.stock-table thead tr:first-child{
+
+    background:#f39c12;
+    color:white;
+}
+
+.stock-table th{
+
+    padding:16px;
+    border:1px solid rgba(255,255,255,.3);
+    text-align:center;
+    white-space:nowrap;
+    font-size:15px;
+}
+
+.stock-table td{
+
+    padding:14px;
+    text-align:center;
+    border:1px solid #ececec;
+    white-space:nowrap;
+}
+
+.stock-table tbody tr:nth-child(even){
+
+    background:#fafafa;
+}
+
+.stock-table tbody tr:hover{
+
+    background:#fff8ec;
+}
+
+/* ===========================
+   BADGES
+=========================== */
+
+.badge{
+
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.badge-entree{
+
+    background:#d4edda;
+    color:#1b7a3c;
+}
+
+.badge-sortie{
+
+    background:#fde2e1;
+    color:#c0392b;
 }
