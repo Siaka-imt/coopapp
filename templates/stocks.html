@@ -208,86 +208,87 @@
             </div>
 
         </div>
-        <div class="card stock-summary-card">
+        <div class="settings-container">
+            <div class="card stock-summary-card">
 
-            <h3>État actuel des stocks</h3>
+                <h3>État actuel des stocks</h3>
 
-            <div class="table-container">
+                <div class="table-container">
 
-                <table class="table stock-summary-table">
+                    <table class="table stock-summary-table">
 
-                    <thead>
-                        <tr>
-                            <th>Produit</th>
-                            <th>Campagne</th>
-                            <th>Entrées (Kg)</th>
-                            <th>Sorties (Kg)</th>
-                            <th>Stock disponible (Kg)</th>
-                            <th>Entrées (Sacs)</th>
-                            <th>Sorties (Sacs)</th>
-                            <th>Sacs disponibles</th>
-                        </tr>
-                    </thead>
+                        <thead>
+                            <tr class="table-group-header">
+                                <th>Produit</th>
+                                <th>Campagne</th>
+                                <th>Entrées (Kg)</th>
+                                <th>Sorties (Kg)</th>
+                                <th>Stock disponible (Kg)</th>
+                                <th>Entrées (Sacs)</th>
+                                <th>Sorties (Sacs)</th>
+                                <th>Sacs disponibles</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
+                        <tbody>
 
-                        {% for stock in stock_summary %}
+                            {% for stock in stock_summary %}
 
-                        <tr>
+                            <tr>
 
-                            <td>{{ stock.produit }}</td>
+                                <td>{{ stock.produit }}</td>
 
-                            <td>{{ stock.campagne }}</td>
+                                <td>{{ stock.campagne }}</td>
 
-                            <td>
-                                {{ stock.total_entree_poids or 0 }}
-                            </td>
+                                <td>
+                                    {{ stock.total_entree_poids or 0 }}
+                                </td>
 
-                            <td>
-                                {{ stock.total_sortie_poids or 0 }}
-                            </td>
+                                <td>
+                                    {{ stock.total_sortie_poids or 0 }}
+                                </td>
 
-                            <td class="stock-value">
-                                <strong>
-                                    {{ stock.stock_poids }}
-                                </strong>
-                            </td>
+                                <td class="stock-value">
+                                    <strong>
+                                        {{ stock.stock_poids }}
+                                    </strong>
+                                </td>
 
-                            <td>
-                                {{ stock.total_entree_sacs or 0 }}
-                            </td>
+                                <td>
+                                    {{ stock.total_entree_sacs or 0 }}
+                                </td>
 
-                            <td>
-                                {{ stock.total_sortie_sacs or 0 }}
-                            </td>
+                                <td>
+                                    {{ stock.total_sortie_sacs or 0 }}
+                                </td>
 
-                            <td class="stock-value">
-                                <strong>
-                                    {{ stock.stock_sacs }}
-                                </strong>
-                            </td>
+                                <td class="stock-value">
+                                    <strong>
+                                        {{ stock.stock_sacs }}
+                                    </strong>
+                                </td>
 
-                        </tr>
+                            </tr>
 
-                        {% else %}
+                            {% else %}
 
-                        <tr>
-                            <td colspan="8">
-                                Aucun stock enregistré.
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="8">
+                                    Aucun stock enregistré.
+                                </td>
+                            </tr>
 
-                        {% endfor %}
+                            {% endfor %}
 
-                    </tbody>
+                        </tbody>
 
-                </table>
+                    </table>
+
+                </div>
 
             </div>
-
-        </div>
-        
-        <div class="settings-container">
+            
+            
             <!-- FORMULAIRE -->
             <div class="card">
                 <h3>Ajouter un mouvement</h3>
@@ -311,96 +312,96 @@
 
                 <h3>🔎 Filtrer les mouvements</h3>
 
-                <form method="GET" action="/stocks" class="stock-filter">
+                    <form method="GET" action="/stocks" class="stock-filter">
 
-                    <select name="produit">
-                        <option value="">Tous les produits</option>
+                        <select name="produit">
+                            <option value="">Tous les produits</option>
 
-                        {% for p in produits %}
-                            <option value="{{ p.produit }}"
-                                {% if produit_selected == p.produit %}selected{% endif %}>
-                                {{ p.produit }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                            {% for p in produits %}
+                                <option value="{{ p.produit }}"
+                                    {% if produit_selected == p.produit %}selected{% endif %}>
+                                    {{ p.produit }}
+                                </option>
+                            {% endfor %}
+                        </select>
 
-                    <select name="campagne">
-                        <option value="">Toutes les campagnes</option>
+                        <select name="campagne">
+                            <option value="">Toutes les campagnes</option>
 
-                        {% for c in campagnes %}
-                            <option value="{{ c.campagne }}"
-                                {% if campagne_selected == c.campagne %}selected{% endif %}>
-                                {{ c.campagne }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                            {% for c in campagnes %}
+                                <option value="{{ c.campagne }}"
+                                    {% if campagne_selected == c.campagne %}selected{% endif %}>
+                                    {{ c.campagne }}
+                                </option>
+                            {% endfor %}
+                        </select>
 
-                    <select name="type">
-                        <option value="">Tous les mouvements</option>
-                        <option value="ENTREE">ENTREE</option>
-                        <option value="SORTIE">SORTIE</option>
-                    </select>
+                        <select name="type">
+                            <option value="">Tous les mouvements</option>
+                            <option value="ENTREE">ENTREE</option>
+                            <option value="SORTIE">SORTIE</option>
+                        </select>
 
-                    <input type="date" name="date_debut">
+                        <input type="date" name="date_debut">
 
-                    <input type="date" name="date_fin">
+                        <input type="date" name="date_fin">
 
-                    <button type="submit" class="filter-btn">
-                        Filtrer
-                    </button>
+                        <button type="submit" class="filter-btn">
+                            Filtrer
+                        </button>
 
-                    <a href="/stocks" class="reset-btn">
-                        Réinitialiser
-                    </a>
+                        <a href="/stocks" class="reset-btn">
+                            Réinitialiser
+                        </a>
 
-                </form>
+                    </form>
 
-            </div>
-            <!-- TABLE -->
-            <div class="card">
+                </div>
+                <!-- TABLE -->
+                <div class="card">
 
-                <table class="table">
-                    <thead>
-                        <tr class="table-group-header">
-                            <th>Date du jour</th>
-                            <th>Produit</th>
-                            <th>Type de mouvement</th>
-                            <th>Date Entrée/Sortie</th>
-                            <th>Qté poids</th>
-                            <th>Nombre sacs</th>
-                            <th>Campagne</th>
-                            <th>Modifier</th>
-                            <th>Supprimer</th>
-                        </tr>
-                    </thead>
+                    <table class="table">
+                        <thead>
+                            <tr class="table-group-header">
+                                <th>Date du jour</th>
+                                <th>Produit</th>
+                                <th>Type de mouvement</th>
+                                <th>Date Entrée/Sortie</th>
+                                <th>Qté poids</th>
+                                <th>Nombre sacs</th>
+                                <th>Campagne</th>
+                                <th>Modifier</th>
+                                <th>Supprimer</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {% for c in stocks %}
-                        <tr>
-                            <td>{{ c.created_at }}</td>
-                            <td>{{ c.produit }}</td>
-                            <td>{{ c.type_mouvement }}</td>
-                            <td>{{ c.date_mouvement }}</td>
-                            <td>{{ c.quantite_poids }}</td>
-                            <td>{{ c.nombre_sacs }}</td>
-                            <td>{{ c.campagne }}</td>
-                            <td>
-                                <button class="edit-btn"><a href="/stocks/edit/{{ c.id }}">✏️ Modifier</a></button>
-                            </td> 
-                            <td>
-                                <form method="POST" action="/stocks/delete/{{ c.id }}">
-                                    <button type="submit" class="delete-btn"
-                                            onclick="return confirm('Supprimer cette ligne ?')">
-                                        🗑 Supprimer
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        <tbody>
+                            {% for c in stocks %}
+                            <tr>
+                                <td>{{ c.created_at }}</td>
+                                <td>{{ c.produit }}</td>
+                                <td>{{ c.type_mouvement }}</td>
+                                <td>{{ c.date_mouvement }}</td>
+                                <td>{{ c.quantite_poids }}</td>
+                                <td>{{ c.nombre_sacs }}</td>
+                                <td>{{ c.campagne }}</td>
+                                <td>
+                                    <button class="edit-btn"><a href="/stocks/edit/{{ c.id }}">✏️ Modifier</a></button>
+                                </td> 
+                                <td>
+                                    <form method="POST" action="/stocks/delete/{{ c.id }}">
+                                        <button type="submit" class="delete-btn"
+                                                onclick="return confirm('Supprimer cette ligne ?')">
+                                            🗑 Supprimer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-            </div>
+                </div>
         </div>
     </main>
 
