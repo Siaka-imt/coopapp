@@ -911,6 +911,16 @@ input:focus {
     white-space: nowrap;
 }
 
+/* Cellules du tableau */
+.table th,
+.table td {
+    padding: 15px 20px;
+    text-align: center;
+    border-right: 1px solid #d5d5d5;
+    border-bottom: 1px solid #d5d5d5;
+    white-space: nowrap;
+}
+
 /* Supprimer la bordure droite de la dernière colonne */
 .table-fiche-client th:last-child,
 .table-fiche-client td:last-child {

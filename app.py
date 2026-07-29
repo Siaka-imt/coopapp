@@ -2301,9 +2301,11 @@ def update_stock(id):
 
     cursor.execute("""
         UPDATE mouvement_stock
-        SET produit = %s, type_mouvement = %s, quantite_poids = %s, nombre_sacs = %s, 
+        SET produit = %s, type_mouvement = %s, quantite_poids = %s, nombre_sacs = %s,
+        date_mouvement = %s, campagne = %s, motif = %s, commentaire = %s, create_at = %s 
         WHERE id = %s
-    """, (nom, id))
+    """, (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement, campagne,
+          motif, commentaire, create_at, id))
 
     conn.commit()
     flash("Ligne modifiée avec succès ✅", "success")

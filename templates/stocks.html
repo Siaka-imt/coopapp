@@ -187,12 +187,10 @@
             </div>
         </div>
         <div class="stats-grid-client-pisteur">
-            <div class="stat-card">
+            <div class="stat-card green">
                 <h4>Stocks Total</h4>
                 <p>{{ stocks|length }}</p>
             </div>
-        </div>
-        <div class="stats-grid-client-pisteur">
             <div class="stat-card">
                 <h4>Total sacs</h4>
                 <p>{{ sacs|length }}</p>
@@ -205,43 +203,62 @@
 
                 <form method="POST" action="/stocks/add" class="form">
                     <input name="produit" placeholder="Produit" required>
-                    <input name="type_mouvement" placeholder="Type de mouvement" required>
+                    <select name="type_mouvement" required>
+                        <option value="" disabled selected>Choisir un mouvement</option>
+                        <option value="Entrée">Entrée</option>
+                        <option value="Sortie">Sortie</option>
+                    </select>
                     <input name="quantite_poids" placeholder="Poids (kg)" required>
                     <input name="nombre_sacs" placeholder="Nombre sacs" required>
                     <input name="date_mouvement" placeholder="Date" required>
                     <input name="campagne" placeholder="Campagne" required>
                     <input name="motif" placeholder="Motif" required>
                     <input name="commentaire" placeholder="Commentaire" required>
-                    <input name="create_at" placeholder="Create_at" required>
+                    <input name="create_at" placeholder="Date de creation" required>
                     <button type="submit">Enregistrer</button>
                 </form>
             </div>
 
             <!-- TABLE -->
             <div class="card">
-                <h3>Liste des zones</h3>
 
                 <table class="table">
                     <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Nombre de pisteurs</th>
-                            <th>Actions</th>
+                        <tr class="table-group-header">
+                            <th>Produit</th>
+                            <th>Type de mouvement</th>
+                            <th>Qté poids</th>
+                            <th>Nombre sacs</th>
+                            <th>Date de mouvement</th>
+                            <th>Campagne</th>
+                            <th>Motif</th>
+                            <th>Commentaire</th>
+                            <th>Date de creation</th>
+                            <th>Modifier</th>
+                            <th>Supprimer</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        {% for c in zones %}
+                        {% for c in stocks %}
                         <tr>
-                            <td>{{ c.nom }}</td>
-                            <td>{{ c.nombre_pisteur }}</td>
+                            <td>{{ c.produit }}</td>
+                            <td>{{ c.type_mouvement }}</td>
+                            <td>{{ c.quantite_poids }}</td>
+                            <td>{{ c.nombre_sacs }}</td>
+                            <td>{{ c.date_mouvement }}</td>
+                            <td>{{ c.campagne }}</td>
+                            <td>{{ c.motif }}</td>
+                            <td>{{ c.commentaire }}</td>
+                            <td>{{ c.create_at }}</td>
+                            <td>{{ c.commentaire }}</td>
                             <td>
-                                <button class="edit-btn"><a href="/zones/edit/{{ c.id }}">✏️ Modifier</a></button>
+                                <button class="edit-btn"><a href="/stocks/edit/{{ c.id }}">✏️ Modifier</a></button>
                             </td> 
                             <td>
-                                <form method="POST" action="/zones/delete/{{ c.id }}">
+                                <form method="POST" action="/stocks/delete/{{ c.id }}">
                                     <button type="submit" class="delete-btn"
-                                            onclick="return confirm('Supprimer cette zone ?')">
+                                            onclick="return confirm('Supprimer cette ligne ?')">
                                         🗑 Supprimer
                                     </button>
                                 </form>
