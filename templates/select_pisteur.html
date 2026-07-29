@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pisteur</title>
+    <title> Fiche Pisteur</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -89,6 +89,12 @@
                         <a href="/products" class="sidebar-nav-link ">
                             <span class="sidebar-nav-icon">📦</span>
                             <span>Produits</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="/stocks" class="sidebar-nav-link">
+                            <span class="sidebar-nav-icon">🏭</span>
+                            <span>Stocks</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
@@ -271,7 +277,7 @@
                     <option value="FINANCEMENT">FINANCEMENT</option>
                     <option value="LIVRAISON">LIVRAISON</option>
                 </select>
-                <input name="campagne" value="{{ campagne_selected}}" placeholder="Campagne" required>
+                <input name="campagne" value="{{ campagne_selected or ''}}" placeholder="Campagne" required>
                 <button type="submit">Ajouter</button>
             </form>
         </div>

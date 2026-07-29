@@ -553,7 +553,7 @@ def select_client(nom):
     search = request.args.get("search", "").strip()
     
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered= True)
 
     # =========================================================
     # 1. Récupérer les campagnes disponibles pour CE client
@@ -1149,7 +1149,7 @@ def select_pisteur(nom):
     search = request.args.get("search", "").strip()
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered= True)
 
     # =========================================================
     # 1. Récupérer les campagnes disponibles pour CE client
@@ -1164,6 +1164,7 @@ def select_pisteur(nom):
     # =========================================================
     # 2. Récupérer la campagne sélectionnée
     # =========================================================
+    #campagne_selected = pisteur_info["campagne"]
     campagne_selected = request.args.get("campagne")
 
     # Si aucune campagne n'est sélectionnée,
@@ -1188,6 +1189,7 @@ def select_pisteur(nom):
                 AND date LIKE %s
                 ORDER BY date DESC
             """, (nom, campagne_selected, f"%{search}"))
+            pisteur_fiche = cursor.fetchall()
 
         else:
             cursor.execute("""
@@ -1196,15 +1198,15 @@ def select_pisteur(nom):
                 WHERE pisteur = %s
                 AND campagne = %s
                 ORDER BY date ASC""",(nom, campagne_selected))
-        pisteur_fiche = cursor.fetchall()
+            pisteur_fiche = cursor.fetchall()
     # =========================================================
     # 4. Calculer les statistiques de la campagne
     # =========================================================
     totals = {
-        "cumul": 0,
         "poids": 0,
-        "livraison": 0,
-        "resultat": 0,
+        "debit": 0,
+        "credit": 0,
+        "solde": 0,
         "sac": 0
     }
     # On prend la dernière ligne de la campagne
@@ -1227,7 +1229,6 @@ def select_pisteur(nom):
         
         totals["sac"] = clean_number(
             derniere_ligne.get("sac_restant"))
-
     # =========================================================
     # 5. Récupérer les informations générales du client
     # =========================================================
@@ -1236,17 +1237,17 @@ def select_pisteur(nom):
         FROM pisteur
         WHERE nom = %s
     """, (nom,))
-
+        
     pisteur_info = cursor.fetchone()
 
     # =========================================================
     # 6. Récupérer la photo de l'utilisateur connecté
     # =========================================================
-    cursor.execute("SELECT photo FROM utilisateur WHERE username = %s", (session["user"],))
+    cursor.execute("""SELECT photo FROM utilisateur WHERE username = %s""", (session["user"],))
     user_photo = cursor.fetchone()
 
-    return render_template("select_pisteur.html",campagnes = campagnes, campagne_selected = campagne_selected, totals = totals, pisteur_info=pisteur_info, nom_pisteur = nom, pisteur_select=pisteur_fiche, user=session["user"],
-        role=session["role"],format_number = clean_number, format_number_after = format_number_after,photo = user_photo["photo"] if user_photo else None)
+    return render_template("select_pisteur.html",campagnes = campagnes, campagne_selected = campagne_selected, totals = totals, pisteur_info = pisteur_info, nom_pisteur = nom, pisteur_select = pisteur_fiche, user = session["user"],
+        role=session["role"], format_number = clean_number, format_number_after = format_number_after, photo = user_photo["photo"] if user_photo else None)
 @app.route("/pisteurs/<nom>")
 def voir_pisteur(nom):
     conn = get_db_connection()
@@ -2214,6 +2215,99 @@ def export_produits_pdf():
         file_path,
         as_attachment=True
     )
+#----------------------------------------------------------------
+# Routes stocks
+#----------------------------------------------------------------
+@app.route("/stocks")
+def stocks():
+    if "user" not in session:
+        return redirect("/")
+    search = request.args.get("search", "").strip()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    if search:
+        cursor.execute("""
+            SELECT *
+            FROM mouvement_stock
+            WHERE campagne LIKE %s
+            ORDER BY campagne
+        """, (f"%{search}%",))
+    else:
+        cursor.execute("""
+            SELECT *
+            FROM mouvement_stock
+            ORDER BY campagne
+        """)
+    data = cursor.fetchall()
+    cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
+    user_photo = cursor.fetchone()
+    return render_template("stocks.html", produits=data, user=session["user"],
+        role=session["role"], photo = user_photo["photo"] if user_photo else None)
+@app.route("/stocks/add", methods=["POST"])
+def add_stock():
+    produit = request.form["produit"]
+    type_mouvement = request.form["type_mouvement"]
+    quantite_poids = request.form["quantite_poids"]
+    nombre_sacs = request.form["nombre_sacs"]
+    date_mouvement = request.form["date_mouvement"]
+    campagne = request.form["campagne"]
+    motif = request.form["motif"]
+    commentaire = request.form["commentaire"]
+    create_at = request.form["create_at"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO mouvement_stocks (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement," \
+        "campagne, motif, commentaire, create_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+        (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement, campagne, motif, commentaire, create_at )
+    )
+    conn.commit()
+    return redirect("/stocks")
+@app.route("/stocks/delete/<int:id>", methods=["POST"])
+def delete_stock(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM mouvement_stock WHERE id = %s", (id,))
+
+    conn.commit()
+    flash("Ligne supprimée avec succès ✅", "success")
+    return redirect("/stocks")
+@app.route("/stocks/edit/<int:id>", methods=["GET"])
+def edit_stock(id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM mouvement_stock WHERE id = %s", (id,))
+    stocks = cursor.fetchone()
+
+    return render_template("edit_stock.html", stocks=stocks)
+@app.route("/stocks/update/<int:id>", methods=["POST"])
+def update_stock(id):
+    produit = request.form["produit"]
+    type_mouvement = request.form["type_mouvement"]
+    quantite_poids = request.form["quantite_poids"]
+    nombre_sacs = request.form["nombre_sacs"]
+    date_mouvement = request.form["date_mouvement"]
+    campagne = request.form["campagne"]
+    motif = request.form["motif"]
+    commentaire = request.form["commentaire"]
+    create_at = request.form["create_at"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE mouvement_stock
+        SET produit = %s, type_mouvement = %s, quantite_poids = %s, nombre_sacs = %s, 
+        WHERE id = %s
+    """, (nom, id))
+
+    conn.commit()
+    flash("Ligne modifiée avec succès ✅", "success")
+    return redirect("/stocks")
 #----------------------------------------------------------------
 # Routes campagnes
 #----------------------------------------------------------------

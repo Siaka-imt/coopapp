@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Ligne Stock</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier un stock</h2>
+        <p class="subtitle">Modifiez les informations</p>
+
+        <form method="POST" action="/stokcs/update/{{ stock.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Nom du produit</label>
+                    <input name="produit" value="{{ stocks.produit }}">
+                </div>
+                <div class="form-row">
+                    <label>Type de mouvement</label>
+                    <input name="type_mouvement" value="{{ stocks.type_mouvement }}">
+                </div>
+                <div class="form-row">
+                    <label>Quantite Poids</label>
+                    <input name="quantite_poids" value="{{ stocks.quantite_poids }}">
+                </div>
+                <div class="form-row">
+                    <label>Nombre sacs</label>
+                    <input name="nombre_sacs" value="{{ stocks.nombre_sacs }}">
+                </div>
+                <div class="form-row">
+                    <label>Date mouvement</label>
+                    <input name="date_mouvement" value="{{ stocks.date_mouvement }}">
+                </div>
+                <div class="form-row">
+                    <label>Campagne</label>
+                    <input name="campagne" value="{{ stocks.campagne }}">
+                </div>
+                <div class="form-row">
+                    <label>Motif</label>
+                    <input name="motif" value="{{ stocks.motif }}">
+                </div>
+                <div class="form-row">
+                    <label>Commentaire</label>
+                    <input name="commentaire" value="{{ stocks.commentaire }}">
+                </div>
+                <div class="form-row">
+                    <label>Date de creation</label>
+                    <input name="create_at" value="{{ stocks.create_at }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/stocks" class="cancel-btn">Annuler</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

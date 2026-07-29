@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistiques pisteurs</title>
+    <title>Stocks</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
-
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-message" class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 <!-- SIDEBAR -->
 <div class="dashboard-layout">
         
@@ -57,7 +67,7 @@
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
-                        <a href="/pisteurs-statistiques" class="sidebar-nav-link active">
+                        <a href="/pisteurs-statistiques" class="sidebar-nav-link ">
                             <span class="sidebar-nav-icon">📈</span>
                             <span>Statistiques Pisteurs</span>
                         </a>
@@ -69,7 +79,7 @@
                 <div class="sidebar-section-title">OPÉRATIONS</div>
                 <ul class="sidebar-nav">
                     <li class="sidebar-nav-item">
-                        <a href="/zones" class="sidebar-nav-link ">
+                        <a href="/zones" class="sidebar-nav-link">
                             <span class="sidebar-nav-icon">📍</span>
                             <span>Zones</span>
                         </a>
@@ -81,7 +91,7 @@
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
-                        <a href="/stocks" class="sidebar-nav-link">
+                        <a href="/stocks" class="sidebar-nav-link active">
                             <span class="sidebar-nav-icon">🏭</span>
                             <span>Stocks</span>
                         </a>
@@ -115,8 +125,8 @@
         <div class="topbar">
 
             <div class="header-left">
-                <h1>Statistiques Pisteurs</h1>
-                <p>Gestion des statistiques des pisteurs</p>
+                <h1>Stocks</h1>
+                <p>Gestion des stocks</p>
             </div>
 
             <div class="header-center">
@@ -126,7 +136,7 @@
                 </div>
             </div>
 
-            <div class="profile-menu">
+           <div class="profile-menu">
 
                 <button class="profile-btn">
                     {% if photo %}
@@ -152,91 +162,95 @@
                 </div>
 
             </div>
+
         </div>
-        <div class="settings-container">
-            <div class="stats-grid">
+        <div class="actions-bar">
+            <div class="export-buttons">
+                <a href="/stocks/export/excel" class="excel-btn">
+                    📊 Export Excel
+                </a>
 
-                <div class="stat-card">
-                    <h4>Total statistiques</h4>
-                    <p>{{ data|length }}</p>
-                </div>
-
-                <div class="stat-card green">
-                    <h4>Poids total</h4>
-                    <p>{{ format_number(totals.poids) }} FCFA</p>
-                </div>
-
-                <div class="stat-card yellow">
-                    <h4>Cumul Debit</h4>
-                    <p>{{ format_number(totals.debit) }} Kg</p>
-                </div>
-
-                <div class="stat-card red">
-                    <h4>Cumul Credit</h4>
-                    <p>{{ format_number(totals.credit) }} FCFA</p>
-                </div>
-
-                <div class="stat-card blue">
-                    <h4>Résultat Solde </h4>
-                    <p>{{ format_number(totals.solde) }} FCFA</p>
-                </div>
-
-                <div class="stat-card black">
-                    <h4>Reste Sac total</h4>
-                    <p>{{ format_number(totals.sac) }} FCFA</p>
-                </div>
-
+                <a href="/stocks/export/pdf" class="pdf-btn">
+                    📄 Export PDF
+                </a>
             </div>
-
-            <div class="card">
-                <h3>Filtrer par campagne</h3>
-
-                <form method="GET" action="/pisteurs-statistiques" class="filter-form">
-                    <label for="campagne">Campagne :</label>
-
-                    <select name="campagne" id="campagne" onchange="this.form.submit()">
-                        <option value="">-- Toutes les campagnes --</option>
-
-                        {% for c in campagnes %}
-                            <option value="{{ c.campagne }}"
-                                {% if campagne_selected == c.campagne %}selected{% endif %}>
-                                {{ c.campagne }}
-                            </option>
-                        {% endfor %}
-                    </select>
-
-                    <button type="submit">Filtrer</button>
+            <div class="m-search">
+                <form method="GET" action="/stocks">
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Rechercher une info..."
+                        value="{{ request.args.get('search', '') }}"
+                    >
+                    <button type="submit">🔍</button>
                 </form>
             </div>
+        </div>
+        <div class="stats-grid-client-pisteur">
+            <div class="stat-card">
+                <h4>Stocks Total</h4>
+                <p>{{ stocks|length }}</p>
+            </div>
+        </div>
+        <div class="stats-grid-client-pisteur">
+            <div class="stat-card">
+                <h4>Total sacs</h4>
+                <p>{{ sacs|length }}</p>
+            </div>
+        </div>
+        <div class="settings-container">
+            <!-- FORMULAIRE -->
+            <div class="card">
+                <h3>Ajouter un mouvement</h3>
+
+                <form method="POST" action="/stocks/add" class="form">
+                    <input name="produit" placeholder="Produit" required>
+                    <input name="type_mouvement" placeholder="Type de mouvement" required>
+                    <input name="quantite_poids" placeholder="Poids (kg)" required>
+                    <input name="nombre_sacs" placeholder="Nombre sacs" required>
+                    <input name="date_mouvement" placeholder="Date" required>
+                    <input name="campagne" placeholder="Campagne" required>
+                    <input name="motif" placeholder="Motif" required>
+                    <input name="commentaire" placeholder="Commentaire" required>
+                    <input name="create_at" placeholder="Create_at" required>
+                    <button type="submit">Enregistrer</button>
+                </form>
+            </div>
+
             <!-- TABLE -->
             <div class="card">
-                <h3>Statistiques par pisteur et par campagne</h3>
+                <h3>Liste des zones</h3>
+
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Pisteur</th>
-                            <th>Campagne</th>
-                            <th>Cumul poids net</th>
-                            <th>Cumul Debit</th>
-                            <th>Cumul Credit</th>
-                            <th>Solde</th>
-                            <th>Sac restant</th>
+                            <th>Nom</th>
+                            <th>Nombre de pisteurs</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        {% for row in data %}
+                        {% for c in zones %}
                         <tr>
-                            <td>{{ row.pisteur }}</td>
-                            <td>{{ row.campagne }}</td>
-                            <td>{{ format_number(row.poids_cumul) }}</td>
-                            <td>{{ format_number(row.debit_cumul) }}</td>
-                            <td>{{ format_number(row.credit_cumul) }}</td>
-                            <td>{{ format_number(row.solde) }}</td>
-                            <td>{{ format_number(row.sac_restant) }}</td>
+                            <td>{{ c.nom }}</td>
+                            <td>{{ c.nombre_pisteur }}</td>
+                            <td>
+                                <button class="edit-btn"><a href="/zones/edit/{{ c.id }}">✏️ Modifier</a></button>
+                            </td> 
+                            <td>
+                                <form method="POST" action="/zones/delete/{{ c.id }}">
+                                    <button type="submit" class="delete-btn"
+                                            onclick="return confirm('Supprimer cette zone ?')">
+                                        🗑 Supprimer
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
-                </table>  
+                </table>
+
             </div>
         </div>
     </main>
@@ -244,4 +258,15 @@
 </div>
 
 </body>
+<script>
+    setTimeout(function() {
+        const flash = document.getElementById("flash-message");
+        if (flash) {
+            flash.style.transition = "all 0.5s ease";
+            flash.style.opacity = "0";
+            flash.style.transform = "translateY(-10px)";
+            setTimeout(() => flash.remove(), 500);
+        }
+    }, 1000);
+</script>
 </html>
