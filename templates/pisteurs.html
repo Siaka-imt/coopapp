@@ -199,20 +199,38 @@
         <div class="settings-container">
             <!-- FORMULAIRE -->
             <div class="card">
-                <h3>Ajouter un pisteur</h3>
+                <h3>📥 Ajouter un pisteur</h3>
 
-                <form method="POST" action="/pisteurs/add" class="form">
+                <form method="POST" action="/pisteurs/add" class="stock-filter">
                     <input name="nom" placeholder="Nom" required>
                     <input name="zone" placeholder="Zone" required>
                     <input name="contact" placeholder="Contact" required>
                     <input name="campagne" placeholder="Campagne" required>
+                    <select name="campagne" placeholder="Campagne" required>
+                        <option value="" disabled selected>Choisir une campagne</option>
+                        <option value="CAJOU 2026">CAJOU 2026</option>
+                        <option value="KARITE 2026">KARITE 2026</option>
+                        <option value="RIZ 2026">RIZ 2026</option>
+                        <option value="SOJA 2026">SOJA 2026</option>
+                        <option value="MAÏS 2026">MAÏS 2026</option>
+                        <option value="CAJOU 2027">CAJOU 2027</option>
+                        <option value="KARITE 2027">KARITE 2027</option>
+                        <option value="RIZ 2027">RIZ 2027</option>
+                        <option value="SOJA 2027">SOJA 2027</option>
+                        <option value="MAÏS 2027">MAÏS 2027</option>
+                        <option value="CAJOU 2028">CAJOU 2028</option>
+                        <option value="KARITE 2028">KARITE 2028</option>
+                        <option value="RIZ 2028">RIZ 2028</option>
+                        <option value="SOJA 2028">SOJA 2028</option>
+                        <option value="MAÏS 2028">MAÏS 2028</option>
+                    </select>
                     <button type="submit">Ajouter</button>
                 </form>
             </div>
             <div class="card">
-                <h3>Filtrer par campagne</h3>
+                <h3>🔎 Filtrer par campagne</h3>
 
-                <form method="GET" action="/pisteurs" class="filter-form">
+                <form method="GET" action="/pisteurs" class="stock-filter">
                     <label for="campagne">Campagne :</label>
 
                     <select name="campagne" id="campagne" onchange="this.form.submit()">

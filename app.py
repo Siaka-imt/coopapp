@@ -424,6 +424,34 @@ def dashboard():
     campagnes_labels = [row[0] for row in campagnes_data]
     campagnes_values = [int(row[1]) for row in campagnes_data]
 
+    cursor.execute("""
+        SELECT
+            produit,
+
+            SUM(
+                CASE
+                    WHEN type_mouvement='ENTREE'
+                    THEN quantite_poids
+                    ELSE -quantite_poids
+                END
+            ) AS poids,
+
+            SUM(
+                CASE
+                    WHEN type_mouvement='ENTREE'
+                    THEN nombre_sacs
+                    ELSE -nombre_sacs
+                END
+            ) AS sacs
+
+        FROM mouvement_stock
+        GROUP BY produit
+        ORDER BY produit
+    """)
+
+    stocks = cursor.fetchall()
+    print("stocks =",stocks)
+
     cursor.close()
     conn.close()
     return render_template(
@@ -431,12 +459,14 @@ def dashboard():
         user=session["user"],
         role=session["role"],
         photo = user_photo[0],
+        stocks = stocks,
         nb_clients=nb_clients,
         nb_pisteurs=nb_pisteurs,
         nb_zones=nb_zones,
         nb_camions=nb_camions,
         nb_campagnes=nb_campagnes,
         nb_produits=nb_produits,
+        format_number = clean_number,
 
         zones_labels=zones_labels,
         zones_values=zones_values,

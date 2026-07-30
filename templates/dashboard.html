@@ -195,15 +195,35 @@
                 <p>{{ nb_campagnes }} campagnes enregistrées</p>
             </a>
             <a href="/stocks" class="card">
-                <div class="card-icon">⚖️</div>
-                <h3>Poids total en stock</h3>
-                <p>{{ 0 }}  Kg</p>
-            </a>
-            <a href="/stocks" class="card">
                 <div class="card-icon">📦📦</div>
                 <h3>Sacs total en stock</h3>
                 <p>{{ 0 }} sacs</p>
             </a>
+        </div>
+        <div class="stock-dashboard">
+
+            {% for stock in stocks %}
+
+            <div class="stock-card">
+
+                <div class="stock-icon">🌰</div>
+
+                <h3>{{ stock[0] }}</h3>
+
+                <div class="stock-values">
+                    
+                    <div class="stock-item">
+                        ⚖️ Poids total en stock <strong>{{ format_number(stock[1]) }}</strong> Kg
+                    </div>
+
+                    <div class="stock-item">
+                        📦 Sacs total en stock <strong>{{ format_number(stock[2]) }}</strong> sacs
+                    </div>
+                </div>
+
+            </div>
+
+            {% endfor %}
 
         </div>
         <!-- CHARTS -->

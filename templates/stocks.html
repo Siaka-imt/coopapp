@@ -291,11 +291,19 @@
             
             <!-- FORMULAIRE -->
             <div class="card">
-                <h3>Ajouter un mouvement</h3>
 
-                    <form method="POST" action="/stocks/add" class="form">
+                <h3>📥 Ajouter un mouvement</h3>
+
+                    <form method="POST" action="/stocks/add" class="stock-filter">
                         <input type="date" name="created_at" placeholder="Date du jour" required>
-                        <input name="produit" placeholder="Produit" required>
+                        <select name="produit" placeholder="Produit" required>
+                            <option value="" disabled selected>Choisir un produit</option>
+                            <option value="cajou">cajou</option>
+                            <option value="karite">karite</option>
+                            <option value="riz">riz</option>
+                            <option value="soja">soja</option>
+                            <option value="maïs">maïs</option>
+                        </select>
                         <select name="type_mouvement" required>
                             <option value="" disabled selected>Choisir un mouvement</option>
                             <option value="ENTREE">ENTREE</option>
@@ -304,7 +312,24 @@
                         <input type="date" name="date_mouvement" placeholder="Date Entrée/Sortie" required>
                         <input name="quantite_poids" placeholder="Poids (kg)" required>
                         <input name="nombre_sacs" placeholder="Nombre sacs" required>
-                        <input name="campagne" placeholder="Campagne" required>
+                        <select name="campagne" placeholder="Campagne" required>
+                            <option value="" disabled selected>Choisir une campagne</option>
+                            <option value="CAJOU 2026">CAJOU 2026</option>
+                            <option value="KARITE 2026">KARITE 2026</option>
+                            <option value="RIZ 2026">RIZ 2026</option>
+                            <option value="SOJA 2026">SOJA 2026</option>
+                            <option value="MAÏS 2026">MAÏS 2026</option>
+                            <option value="CAJOU 2027">CAJOU 2027</option>
+                            <option value="KARITE 2027">KARITE 2027</option>
+                            <option value="RIZ 2027">RIZ 2027</option>
+                            <option value="SOJA 2027">SOJA 2027</option>
+                            <option value="MAÏS 2027">MAÏS 2027</option>
+                            <option value="CAJOU 2028">CAJOU 2028</option>
+                            <option value="KARITE 2028">KARITE 2028</option>
+                            <option value="RIZ 2028">RIZ 2028</option>
+                            <option value="SOJA 2028">SOJA 2028</option>
+                            <option value="MAÏS 2028">MAÏS 2028</option>
+                        </select>
                         <button type="submit">Enregistrer</button>
                     </form>
             </div>
@@ -359,6 +384,8 @@
                 </div>
                 <!-- TABLE -->
                 <div class="card">
+
+                    <h3>Historique des mouvements</h3>
 
                     <table class="table">
                         <thead>
