@@ -1072,7 +1072,7 @@ def export_fiche_clients_pdf(nom):
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
@@ -1541,7 +1541,7 @@ def export_pisteurs_pdf():
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
@@ -1651,7 +1651,7 @@ def export_fiche_pisteurs_pdf(nom):
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
@@ -1845,7 +1845,7 @@ def export_camions_pdf():
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
@@ -2037,7 +2037,7 @@ def export_zones_pdf():
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
@@ -2226,7 +2226,7 @@ def export_produits_pdf():
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
@@ -2448,6 +2448,124 @@ def update_stock(id):
     conn.commit()
     flash("Ligne modifiée avec succès ✅", "success")
     return redirect(url_for("stocks"))
+@app.route("/stocks/export/excel")
+def export_stocks_excel():
+
+    conn = get_db_connection()
+
+    query = "SELECT * FROM mouvement_stock"
+
+    df = pd.read_sql(query, conn)
+
+    file_path = "historique_stocks.xlsx"
+
+    df.to_excel(file_path, index=False)
+
+    return send_file(
+        file_path,
+        as_attachment=True
+    )
+@app.route("/stocks/export/pdf")
+def export_stocks_pdf():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""SELECT
+            created_at,
+            produit,
+            type_mouvement,
+            date_mouvement,
+            quantite_poids,
+            nombre_sacs,
+            campagne
+        FROM mouvement_stock """)
+
+    data = cursor.fetchall()
+
+    file_path = "historique_stock.pdf"
+
+    pdf = SimpleDocTemplate(file_path, pagesize=landscape(letter))
+
+    elements = []
+
+    # =========================
+    # LOGO
+    # =========================
+    logo_path = os.path.join("static", "images", "logo.png")
+
+    logo = Image(logo_path, width=80, height=80)
+
+    elements.append(logo)
+
+    # espace
+    elements.append(Spacer(1, 20))
+
+    # =========================
+    # TITRE
+    # =========================
+
+    styles = getSampleStyleSheet()
+
+    date_text = Paragraph( f"Généré le : {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles['Normal'])
+
+    elements.append(date_text)
+
+    elements.append(Spacer(1, 20))
+
+    company = Paragraph( "<b>SOCIETE COOPÉRATIVE DES PRODUCTEURS AGRICOLES WOTAGAWENA DE KORHOGO</b>", styles['Heading2'] )
+
+    elements.append(company)
+
+    elements.append(Spacer(1, 20))
+
+    title = Paragraph(
+        "<b>Histique des stocks enregistrés</b>",
+        styles['Title']
+    )
+
+    elements.append(title)
+
+    elements.append(Spacer(1, 20))
+    # =========================
+    # TABLEAU
+    # =========================
+
+    table_data = [
+        ["Date enregistrement", "Produit", "ENTREE/SORTIE", "Date E/S", "Qté Poids", "Nombre sacs", "Campagne"]
+    ]
+
+    for row in data:
+        table_data.append(list(row))
+
+    table = Table(table_data, repeatRows=1)
+
+    table.setStyle(TableStyle([
+
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
+
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+
+        ('BOTTOMPADDING', (0,0), (-1,0), 12),
+
+        ('GRID', (0,0), (-1,-1), 1, colors.black),
+
+    ]))
+
+    elements.append(table)
+
+    # =========================
+    # BUILD PDF
+    # =========================
+
+    pdf.build(elements)
+
+    return send_file(
+        file_path,
+        as_attachment=True
+    )
 #----------------------------------------------------------------
 # Routes campagnes
 #----------------------------------------------------------------
@@ -2614,7 +2732,7 @@ def export_campagnes_pdf():
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
@@ -3045,7 +3163,7 @@ def export_users_pdf():
 
     table.setStyle(TableStyle([
 
-        ('BACKGROUND', (0,0), (-1,0), colors.green),
+        ('BACKGROUND', (0,0), (-1,0), colors.orange),
 
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
 
