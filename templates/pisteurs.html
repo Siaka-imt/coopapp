@@ -248,47 +248,49 @@
             </div>
             <!-- TABLE -->
             <div class="card">
-                <h3>Liste des pisteurs</h3>
+                <h3>📋 Liste des pisteurs</h3>
 
-                <table class="table">
-                    <thead>
-                        <tr class="table-group-header">
-                            <th>Nom</th>
-                            <th>Zone</th>
-                            <th>Contact</th>
-                            <th>Campagne</th>
-                            <th>Voir fiche</th>
-                            <th>Modifier</th>
-                            <th>Supprimer</th>
-                        </tr>
-                    </thead>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr class="table-group-header">
+                                <th>Nom</th>
+                                <th>Zone</th>
+                                <th>Contact</th>
+                                <th>Campagne</th>
+                                <th>Voir fiche</th>
+                                <th>Modifier</th>
+                                <th>Supprimer</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {% for c in pisteurs %}
-                        <tr>
-                            <td>{{ c.nom }}</td>
-                            <td>{{ c.zone }}</td>
-                            <td>{{ c.contact }}</td>
-                            <td>{{ c.campagne }}</td>
-                            <td>
-                                <button class="select-btn"><a href="/pisteurs/select/{{ c.nom }}">🔍 Voir fiche</a></button>
-                            </td>
-                            <td>
-                                <button class="edit-btn"><a href="/pisteurs/edit/{{ c.id }}">✏️ Modifier</a></button>
-                            </td>
-                            
-                            <td>
-                                <form method="POST" action="/pisteurs/delete/{{ c.id }}">
-                                    <button type="submit" class="delete-btn"
-                                            onclick="return confirm('Supprimer ce pisteur ?')">
-                                        🗑 Supprimer
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        <tbody>
+                            {% for c in pisteurs %}
+                            <tr>
+                                <td>{{ c.nom }}</td>
+                                <td>{{ c.zone }}</td>
+                                <td>{{ c.contact }}</td>
+                                <td>{{ c.campagne }}</td>
+                                <td>
+                                    <button class="select-btn"><a href="/pisteurs/select/{{ c.nom }}">🔍 Voir fiche</a></button>
+                                </td>
+                                <td>
+                                    <button class="edit-btn"><a href="/pisteurs/edit/{{ c.id }}">✏️ Modifier</a></button>
+                                </td>
+                                
+                                <td>
+                                    <form method="POST" action="/pisteurs/delete/{{ c.id }}">
+                                        <button type="submit" class="delete-btn"
+                                                onclick="return confirm('Supprimer ce pisteur ?')">
+                                            🗑 Supprimer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>

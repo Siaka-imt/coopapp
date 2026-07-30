@@ -208,45 +208,46 @@
 
             <!-- TABLE -->
             <div class="card">
-                <h3>Liste des camions</h3>
+                <h3>📋 Liste des camions</h3>
 
-                <table class="table">
-                    <thead>
-                        <tr class="table-group-header">
-                            <th>Numéro</th>
-                            <th>Date de départ</th>
-                            <th>Date de retour</th>
-                            <th>Destination</th>
-                            <th>Usager</th>
-                            <th>Modifier</th>
-                            <th>Supprimer</th>
-                        </tr>
-                    </thead>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr class="table-group-header">
+                                <th>Numéro</th>
+                                <th>Date de départ</th>
+                                <th>Date de retour</th>
+                                <th>Destination</th>
+                                <th>Usager</th>
+                                <th>Modifier</th>
+                                <th>Supprimer</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {% for c in camions %}
-                        <tr>
-                            <td>{{ c.numero }}</td>
-                            <td>{{ c.date_depart }}</td>
-                            <td>{{ c.date_retour }}</td>
-                            <td>{{ c.destination }}</td>
-                            <td>{{ c.usager }}</td>
-                            <td>
-                                <button class="edit-btn"><a href="/camions/edit/{{ c.id }}">✏️ Modifier</a></button>
-                            </td> 
-                            <td>
-                                <form method="POST" action="/camions/delete/{{ c.id }}">
-                                    <button type="submit" class="delete-btn"
-                                            onclick="return confirm('Supprimer ce camion ?')">
-                                        🗑 Supprimer
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
+                        <tbody>
+                            {% for c in camions %}
+                            <tr>
+                                <td>{{ c.numero }}</td>
+                                <td>{{ c.date_depart }}</td>
+                                <td>{{ c.date_retour }}</td>
+                                <td>{{ c.destination }}</td>
+                                <td>{{ c.usager }}</td>
+                                <td>
+                                    <button class="edit-btn"><a href="/camions/edit/{{ c.id }}">✏️ Modifier</a></button>
+                                </td> 
+                                <td>
+                                    <form method="POST" action="/camions/delete/{{ c.id }}">
+                                        <button type="submit" class="delete-btn"
+                                                onclick="return confirm('Supprimer ce camion ?')">
+                                            🗑 Supprimer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>

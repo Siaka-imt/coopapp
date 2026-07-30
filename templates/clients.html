@@ -249,47 +249,49 @@
         
         <!-- TABLE -->
         <div class="card">
-            <h3>Liste des clients</h3>
+            <h3>📋 Liste des clients</h3>
 
-            <table class="table">
-                <thead>
-                    <tr class="table-group-header">
-                        <th>Nom</th>
-                        <th>Contact</th>
-                        <th>Localisation</th>
-                        <th>Campagne</th>
-                        <th>Voir fiche</th>
-                        <th>Modifier</th>
-                        <th>Supprimer</th>
-                    </tr>
-                </thead>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr class="table-group-header">
+                            <th>Nom</th>
+                            <th>Contact</th>
+                            <th>Localisation</th>
+                            <th>Campagne</th>
+                            <th>Voir fiche</th>
+                            <th>Modifier</th>
+                            <th>Supprimer</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    {% for c in clients %}
-                    <tr>
-                        <td>{{ c.nom }}</td>
-                        <td>{{ c.contact }}</td>
-                        <td>{{ c.localisation }}</td>
-                        <td>{{ c.campagne }}</td>
-                        <td>
-                            <button class="select-btn"><a href="/clients/select/{{ c.nom }}">🔍 Voir fiche</a></button>
-                        </td> 
+                    <tbody>
+                        {% for c in clients %}
+                        <tr>
+                            <td>{{ c.nom }}</td>
+                            <td>{{ c.contact }}</td>
+                            <td>{{ c.localisation }}</td>
+                            <td>{{ c.campagne }}</td>
+                            <td>
+                                <button class="select-btn"><a href="/clients/select/{{ c.nom }}">🔍 Voir fiche</a></button>
+                            </td> 
 
-                        <td>
-                            <button class="edit-btn"><a href="/clients/edit/{{ c.id }}">✏️ Modifier</a></button>
-                        </td> 
-                        <td>
-                            <form method="POST" action="/clients/delete/{{ c.id }}">
-                                <button type="submit" class="delete-btn"
-                                        onclick="return confirm('Supprimer ce client ?')">
-                                    🗑 Supprimer
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            <td>
+                                <button class="edit-btn"><a href="/clients/edit/{{ c.id }}">✏️ Modifier</a></button>
+                            </td> 
+                            <td>
+                                <form method="POST" action="/clients/delete/{{ c.id }}">
+                                    <button type="submit" class="delete-btn"
+                                            onclick="return confirm('Supprimer ce client ?')">
+                                        🗑 Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         </div>
     </main>
