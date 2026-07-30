@@ -2646,7 +2646,7 @@ def settings():
     if "user" not in session:
         return redirect("/")
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary = True, buffered = True)
 
     # 👉 GESTION DU FORMULAIRE
     if request.method == "POST":
@@ -2693,6 +2693,10 @@ def settings():
 
     cursor.execute("SELECT COUNT(*) as total FROM utilisateur")
     stats["utilisateurs"] = cursor.fetchone()["total"]
+
+    cursor.execute("SELECT DISTINCT produit FROM mouvement_stock")
+    produit_stock = cursor.fetchall()
+    stats["produits_stock"] = len(produit_stock)
 
     return render_template(
         "settings.html",
