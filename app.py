@@ -2306,7 +2306,7 @@ def stocks():
             )AS total_sortie_poids,
             SUM(
                 CASE
-                    WHEN type_mouvement = 'SORTIE'
+                    WHEN type_mouvement = 'ENTREE'
                     THEN nombre_sacs
                     ELSE 0
                 END
@@ -2336,7 +2336,6 @@ def stocks():
         stock["stock_sacs"] = (
             (stock["total_entree_sacs"] or 0) - (stock["total_sortie_sacs"] or 0)
         )
-
     # =====================================================
     # 4. Campagnes disponibles
     # =====================================================
