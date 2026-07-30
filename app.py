@@ -347,7 +347,7 @@ def dashboard():
         return redirect("/")
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered = True)
 
     cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
     user_photo = cursor.fetchone()
@@ -369,6 +369,10 @@ def dashboard():
 
     cursor.execute("SELECT COUNT(*) FROM produit")
     nb_produits = cursor.fetchone()[0]
+
+    cursor.execute("SELECT DISTINCT produit FROM mouvement_stock")
+    produit_stock = cursor.fetchall()
+    nb_produit_stock = len(produit_stock)
 
     # ======================================
     # Répartition des pisteurs par zone
@@ -450,7 +454,6 @@ def dashboard():
     """)
 
     stocks = cursor.fetchall()
-    print("stocks =",stocks)
 
     cursor.close()
     conn.close()
@@ -475,7 +478,9 @@ def dashboard():
         villes_values=villes_values,
 
         campagnes_labels=campagnes_labels,
-        campagnes_values=campagnes_values
+        campagnes_values=campagnes_values,
+
+        nb_produit_stock = nb_produit_stock
     )
 #----------------------------------------------------------------
 # Routes clients
