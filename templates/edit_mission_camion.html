@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Ligne Livraison</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>✏️ Modifier une info de livraison</h2>
+        <p class="subtitle">Modifiez les informations</p>
+
+        <form method="POST" action="/transports/update/{{ livraison.id }}" 
+      onsubmit="return confirm('Confirmer la modification ?')">
+            <div class="form-group">
+                <div class="form-row">
+                    <label>Camion</label>
+                    <input name="camion" value="{{ livraison.camion }}">
+                </div>
+                <div class="form-row">
+                    <label>Client</label>
+                    <input name="client" value="{{ livraison.client }}">
+                </div>
+                <div class="form-row">
+                    <label>Campagne</label>
+                    <input name="campagne" value="{{ livraison.campagne }}">
+                </div>
+                <div class="form-row">
+                    <label>Date depart</label>
+                    <input name="date_depart" type = "date" value="{{ livraison.date_depart }}">
+                </div>
+                <div class="form-row">
+                    <label>Destination</label>
+                    <input name="destination" value="{{ livraison.destination }}">
+                </div>
+                <div class="form-row">
+                    <label>Quantite Poids</label>
+                    <input name="quantite_poids" value="{{ livraison.quantite_poids }}">
+                </div>
+                <div class="form-row">
+                    <label>Nombre sacs</label>
+                    <input name="nombre_sacs" value="{{ livraison.nombre_sacs }}">
+                </div>
+                <div class="form-row">
+                    <label>Etat</label>
+                    <select name="etat">
+                        <option value="LIVRE" {% if livraison.etat == "LIVRE" %}selected{% endif %}>LIVRE</option>
+                        <option value="LIVRAISON EN COURS" {% if livraison.etat == "LIVRAISON EN COURS" %}selected{% endif %}>EN COURS DE LIVRAISON</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="edit-btn">💾 Enregistrer</button>
+                <a href="/transports" class="cancel-btn">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

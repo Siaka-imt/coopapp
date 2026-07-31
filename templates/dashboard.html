@@ -93,9 +93,9 @@
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
-                        <a href="/camions" class="sidebar-nav-link ">
+                        <a href="/transports" class="sidebar-nav-link ">
                             <span class="sidebar-nav-icon">🚚</span>
-                            <span>Camions</span>
+                            <span>Transports</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
@@ -110,6 +110,7 @@
 
     <!-- MAIN -->
     <main class="main">
+        <div class="dashboard-header">
         <!-- TOPBAR -->
         <div class="topbar">
 
@@ -155,9 +156,19 @@
                 </div>
 
             </div>
-
+            </div>
         </div>
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-accent"></span>
 
+                <div>
+                    <h2>Vue d'ensemble</h2>
+                    <p>Suivi général des activités de la coopérative</p>
+                </div>
+                <div class="line"></div>
+            </div>
+        </div>
         <!-- CARDS -->
         <div class="cards">
 
@@ -179,10 +190,10 @@
                 <p>{{ nb_zones }} zones enregistrées</p>
             </a>
 
-            <a href="/camions" class="card">
+            <a href="/transports" class="card">
                 <div class="card-icon">🚚</div>
-                <h3>Camions</h3>
-                <p>{{ nb_camions }} camions enregistrés</p>
+                <h3>Camions livrés</h3>
+                <p>{{ nb_livraisons }} livraisons</p>
             </a>
             <a href="/produits" class="card">
                 <div class="card-icon">🌾</div>
@@ -200,6 +211,17 @@
                 <p>{{ nb_produit_stock }} produits</p>
             </a>
         </div>
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-accent"></span>
+
+                <div>
+                    <h2>État des stocks</h2>
+                    <p>Suivi en temps réel des produits disponibles.</p>
+                </div>
+                <div class="line"></div>
+            </div>
+        </div>
         <div class="stock-dashboard">
 
             {% for stock in stocks %}
@@ -213,11 +235,11 @@
                 <div class="stock-values">
                     
                     <div class="stock-item">
-                        ⚖️ Poids total en stock <strong>{{ format_number(stock[1]) }}</strong> Kg
+                        ⚖️ Poids total en stock <strong>{{ format_number_after(format_number(stock[1])) }}</strong> Kg
                     </div>
 
                     <div class="stock-item">
-                        📦 Sacs total en stock <strong>{{ format_number(stock[2]) }}</strong> sacs
+                        📦 Sacs total en stock <strong>{{ format_number_after(format_number(stock[2])) }}</strong> sacs
                     </div>
                 </div>
 
@@ -225,6 +247,60 @@
 
             {% endfor %}
 
+        </div>
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-accent"></span>
+
+                <div>
+                    <h2>Livraisons effectuées</h2>
+                    <p>Suivi en temps réel des livraisons.</p>
+                </div>
+                <div class="line"></div>
+            </div>
+        </div>
+        <div class="stock-dashboard">
+
+            {% for livraison in livraisons %}
+
+            <div class="stock-card">
+
+                <div class="stock-icon">🌰</div>
+
+                <h3>{{ livraison[1] }}</h3>
+                <p>{{ livraison[0] }}</p>
+                <p>{{ livraison[2] }}</p>
+
+                <div class="stock-values">
+                    
+                    <div class="stock-item">
+                        🚛 Nombre total de livraisons <strong>{{ format_number_after(format_number(livraison[3])) }}</strong> livraisons
+                    </div>
+
+                    <div class="stock-item">
+                        ⚖️ Poids total livré <strong>{{ format_number_after(format_number(livraison[4])) }}</strong> Kg
+                    </div>
+
+                    <div class="stock-item">
+                        📦 Sacs total livré <strong>{{ format_number_after(format_number(livraison[5])) }}</strong> sacs
+                    </div>
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-accent"></span>
+                
+                <div>
+                    <h2>Indicateurs graphiques</h2>
+                    <p>Données de la coopérative.</p>
+                </div>
+                <div class="line"></div>
+            </div>
         </div>
         <!-- CHARTS -->
         <div class="charts">

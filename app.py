@@ -361,8 +361,8 @@ def dashboard():
     cursor.execute("SELECT COUNT(*) FROM zone")
     nb_zones = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM camion")
-    nb_camions = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM mission_camion WHERE etat = 'LIVRE'")
+    nb_livraisons = cursor.fetchone()[0]
 
     cursor.execute("SELECT COUNT(*) FROM campagne")
     nb_campagnes = cursor.fetchone()[0]
@@ -455,6 +455,26 @@ def dashboard():
 
     stocks = cursor.fetchall()
 
+    cursor.execute("""
+        SELECT
+            campagne,
+            client,
+            destination,
+
+            COUNT(*) AS nombre_livraisons,
+
+            SUM(quantite_poids) AS poids_total,
+
+            SUM(nombre_sacs) AS sacs_total
+
+        FROM mission_camion
+
+        WHERE etat = 'LIVRE'
+        GROUP BY campagne, client, destination
+        ORDER BY campagne DESC, client, destination
+    """)
+    livraisons = cursor.fetchall()
+
     cursor.close()
     conn.close()
     return render_template(
@@ -466,10 +486,11 @@ def dashboard():
         nb_clients=nb_clients,
         nb_pisteurs=nb_pisteurs,
         nb_zones=nb_zones,
-        nb_camions=nb_camions,
+        nb_livraisons=nb_livraisons,
         nb_campagnes=nb_campagnes,
         nb_produits=nb_produits,
         format_number = clean_number,
+        format_number_after = format_number_after,
 
         zones_labels=zones_labels,
         zones_values=zones_values,
@@ -480,7 +501,9 @@ def dashboard():
         campagnes_labels=campagnes_labels,
         campagnes_values=campagnes_values,
 
-        nb_produit_stock = nb_produit_stock
+        nb_produit_stock = nb_produit_stock,
+
+        livraisons = livraisons
     )
 #----------------------------------------------------------------
 # Routes clients
@@ -1676,96 +1699,197 @@ def export_fiche_pisteurs_pdf(nom):
         as_attachment=True
     )
 #----------------------------------------------------------------
-# Routes Camions
+# Routes Missions Camions
 #----------------------------------------------------------------
-@app.route("/camions")
-def camions():
+@app.route("/transports")
+def mission_camions():
     if "user" not in session:
         return redirect("/")
+    
     search = request.args.get("search", "").strip()
+    campagne_selected = request.args.get("campagne", "")
+    client_selected = request.args.get("client", "")
+    destination_selected = request.args.get("destination", "")
+
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered = True)
+
+    # =====================================================
+    # 1. Historique des mouvements
+    # =====================================================
+    query = """ SELECT * FROM mission_camion WHERE 1=1"""
+    params = []
+
     if search:
-        cursor.execute("""
-            SELECT *
-            FROM camion
-            WHERE numero LIKE %s
-            ORDER BY numero
-        """, (f"%{search}%",))
-    else:
-        cursor.execute("SELECT * FROM camion")
+        query += " AND (client LIKE %s OR campagne LIKE %s OR destination LIKE %s)"
+        params.extend([
+            f"%{search}"
+            f"%{search}"
+            f"%{search}"
+        ])
+    if campagne_selected:
+        query += " AND campagne =%s"
+        params.append(campagne_selected)
+    if client_selected:
+        query += " AND client = %s"
+        params.append(client_selected)
+    if destination_selected:
+        query += " AND destination = %s"
+        params.append(destination_selected)
+
+    query += " ORDER BY date_depart DESC"
+
+    cursor.execute(query, params)
     data = cursor.fetchall()
+
+    # =====================================================
+    # 2. Résumé actuel des livraisons
+    # =====================================================
+    
+    query_mission = """ 
+        SELECT
+            campagne,
+            client,
+            destination,
+
+            COUNT(*) AS nombre_livraisons,
+
+            COUNT(DISTINCT camion) AS nombre_camions,
+
+            SUM(quantite_poids) AS poids_total,
+
+            SUM(nombre_sacs) AS sacs_total
+
+        FROM mission_camion
+
+        WHERE etat = 'LIVRE'
+
+        GROUP BY campagne, client, destination
+        ORDER BY campagne DESC, client, destination
+    """
+    cursor.execute(query_mission)
+    mission_summary = cursor.fetchall()
+
+    # =====================================================
+    # 3. Campagnes disponibles
+    # =====================================================
+    cursor.execute("""
+        SELECT DISTINCT campagne 
+        FROM mission_camion
+        ORDER BY campagne DESC
+    """)
+    campagnes = cursor.fetchall()
+
+    # =====================================================
+    # 4. Total livraisons
+    # =====================================================
+    total_poids = sum(
+        row["poids_total"] or 0
+        for row in mission_summary
+    )
+
+    total_sacs = sum(
+        row["sacs_total"] or 0
+        for row in mission_summary
+    )
+
+    total_livraisons = sum(
+        row["nombre_livraisons"] or 0
+        for row in mission_summary
+    )
+
+    # =====================================================
+    # 5. Clients disponibles
+    # =====================================================
+    cursor.execute("""
+        SELECT DISTINCT client
+        FROM mission_camion
+        ORDER BY client
+    """)
+    clients = cursor.fetchall()
+
+    # =====================================================
+    # 6. Photo utilisateur
+    # =====================================================
     cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
     user_photo = cursor.fetchone()
-    return render_template("camions.html", camions=data, user=session["user"],
-        role=session["role"], photo=user_photo["photo"] if user_photo else None)
-@app.route("/camions/add", methods=["POST"])
-def add_camion():
-    numero = request.form["numero"]
-    depart = request.form["date_depart"]
-    retour = request.form["date_retour"]
+
+    return render_template("camions.html", camions = data,format_number =clean_number, format_number_after = format_number_after, mission_summary = mission_summary, total_poids = total_poids, total_sacs = total_sacs, total_livraisons = total_livraisons, campagnes = campagnes, user = session["user"],
+        role = session["role"], clients = clients, campagne_selected = campagne_selected, destination_selected = destination_selected, client_selected = client_selected, photo = user_photo["photo"] if user_photo else None)
+@app.route("/transports/add", methods=["POST"])
+def add_mission_camions():
+    camion = request.form["camion"]
+    client = request.form["client"]
+    campagne = request.form["campagne"]
+    date_depart = request.form["date_depart"]
     destination = request.form["destination"]
-    usager = request.form["usager"]
+    quantite_poids = request.form["quantite_poids"]
+    nombre_sacs = request.form["nombre_sacs"]
+    etat = request.form["etat"]
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO camion (numero, date_depart, date_retour, destination, usager) VALUES (%s, %s, %s, %s, %s)",
-        (numero, depart, retour, destination, usager)
+        "INSERT INTO mission_camion (camion, client, campagne, date_depart, destination, quantite_poids, nombre_sacs, etat) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+        (camion, client, campagne, date_depart, destination, quantite_poids, nombre_sacs, etat )
     )
-
     conn.commit()
-    return redirect("/camions")
-@app.route("/camions/delete/<int:id>", methods=["POST"])
-def delete_camion(id):
+    flash("Ligne ajoutée avec succès ✅", "success")
+    return redirect(url_for("mission_camions"))
+@app.route("/transports/delete/<int:id>", methods=["POST"])
+def delete_mission_camion(id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM camion WHERE id = %s", (id,))
+    cursor.execute("DELETE FROM mission_camion WHERE id = %s", (id,))
 
     conn.commit()
-    flash("Camion supprimé avec succès ✅", "success")
-    return redirect("/camions")
-@app.route("/camions/edit/<int:id>", methods=["GET"])
-def edit_camion(id):
+    flash("Ligne supprimée avec succès ✅", "success")
+    return redirect("/transports")
+@app.route("/transports/edit/<int:id>", methods=["GET"])
+def edit_mission_camion(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM camion WHERE id = %s", (id,))
-    camion = cursor.fetchone()
+    cursor.execute("SELECT * FROM mission_camion WHERE id = %s", (id,))
+    livraison = cursor.fetchone()
 
-    return render_template("edit_camion.html", camion=camion)
-@app.route("/camions/update/<int:id>", methods=["POST"])
-def update_camion(id):
-    numero = request.form["numero"]
+    return render_template("edit_mission_camion.html", livraison = livraison)
+@app.route("/transports/update/<int:id>", methods=["POST"])
+def update_mission_camion(id):
+    camion = request.form["camion"]
+    client = request.form["client"]
+    campagne = request.form["campagne"]
     date_depart = request.form["date_depart"]
-    date_retour = request.form["date_retour"]
     destination = request.form["destination"]
-    usager = request.form["usager"]
+    quantite_poids = request.form["quantite_poids"]
+    nombre_sacs = request.form["nombre_sacs"]
+    etat = request.form["etat"]
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        UPDATE camion 
-        SET numero = %s, date_depart = %s, date_retour = %s, destination = %s, usager = %s
+        UPDATE mission_camion
+        SET camion = %s, client = %s, campagne = %s, date_depart =%s, destination = %s, quantite_poids = %s,
+        nombre_sacs = %s, etat = %s
         WHERE id = %s
-    """, (numero, date_depart, date_retour, destination, usager, id))
+    """, (camion, client, campagne, date_depart, destination, quantite_poids, nombre_sacs, etat, id))
 
     conn.commit()
-    flash("Camion modifié avec succès ✅", "success")
-    return redirect("/camions")
-@app.route("/camions/export/excel")
-def export_camions_excel():
+    flash("Ligne modifiée avec succès ✅", "success")
+    return redirect(url_for("mission_camions"))
+@app.route("/transports/export/excel")
+def export_mission_camion_excel():
 
     conn = get_db_connection()
 
-    query = "SELECT numero, date_depart, date_retour, destination, usager FROM camion"
+    query = "SELECT * FROM mission_camion"
 
     df = pd.read_sql(query, conn)
 
-    file_path = "camions.xlsx"
+    file_path = "historique_mission_camions.xlsx"
 
     df.to_excel(file_path, index=False)
 
@@ -1773,20 +1897,26 @@ def export_camions_excel():
         file_path,
         as_attachment=True
     )
-@app.route("/camions/export/pdf")
-def export_camions_pdf():
+@app.route("/transports/export/pdf")
+def export_mission_camion_pdf():
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT numero, date_depart, date_retour, destination, usager
-        FROM camion
-    """)
+    cursor.execute("""SELECT
+            camion,
+            client,
+            campagne,
+            date_depart,
+            destination,
+            quantite_poids,
+            nombre_sacs,
+            etat
+        FROM mission_camion """)
 
     data = cursor.fetchall()
 
-    file_path = "camions.pdf"
+    file_path = "historique_livraisons.pdf"
 
     pdf = SimpleDocTemplate(file_path, pagesize=landscape(letter))
 
@@ -1823,7 +1953,7 @@ def export_camions_pdf():
     elements.append(Spacer(1, 20))
 
     title = Paragraph(
-        "<b>Liste des camions enregistrés</b>",
+        "<b>Histique des livraisons enregistrées</b>",
         styles['Title']
     )
 
@@ -1835,7 +1965,7 @@ def export_camions_pdf():
     # =========================
 
     table_data = [
-        ["Numero", "Date de départ", "Date de retour", "Destination", "Usager"]
+        ["N° camion", "Client", "Campagne", "Date départ", "Destination", "Qté Poids", "Nombre sacs", "Etat"]
     ]
 
     for row in data:
@@ -2382,7 +2512,7 @@ def stocks():
     cursor.execute("SELECT photo FROM utilisateur WHERE username=%s", (session["user"],))
     user_photo = cursor.fetchone()
 
-    return render_template("stocks.html", stocks = data, stock_summary = stock_summary, total_poids_stock = total_poids_stock, total_sacs_stock = total_sacs_stock, total_produits = total_produits, campagnes = campagnes, user = session["user"],
+    return render_template("stocks.html",format_number = clean_number, format_number_after = format_number_after, stocks = data, stock_summary = stock_summary, total_poids_stock = total_poids_stock, total_sacs_stock = total_sacs_stock, total_produits = total_produits, campagnes = campagnes, user = session["user"],
         role = session["role"], produits = produits, campagne_selected = campagne_selected, produit_selected = produit_selected, photo = user_photo["photo"] if user_photo else None)
 @app.route("/stocks/add", methods=["POST"])
 def add_stock():

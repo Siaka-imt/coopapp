@@ -103,9 +103,9 @@
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
-                        <a href="/camions" class="sidebar-nav-link ">
+                        <a href="/transports" class="sidebar-nav-link ">
                             <span class="sidebar-nav-icon">🚚</span>
-                            <span>Camions</span>
+                            <span>Transports</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
@@ -225,30 +225,30 @@
                                 <td>{{ stock.campagne }}</td>
 
                                 <td>
-                                    {{ stock.total_entree_poids or 0 }}
+                                    {{ format_number_after(format_number(stock.total_entree_poids)) }}
                                 </td>
 
                                 <td>
-                                    {{ stock.total_sortie_poids or 0 }}
+                                    {{ format_number_after(format_number(stock.total_sortie_poids)) }}
                                 </td>
 
                                 <td class="stock-value">
                                     <strong>
-                                        {{ stock.stock_poids }}
+                                        {{ format_number_after(format_number(stock.stock_poids)) }}
                                     </strong>
                                 </td>
 
                                 <td>
-                                    {{ stock.total_entree_sacs or 0 }}
+                                    {{ format_number_after(format_number(stock.total_entree_sacs)) }}
                                 </td>
 
                                 <td>
-                                    {{ stock.total_sortie_sacs or 0 }}
+                                    {{ format_number_after(format_number(stock.total_sortie_sacs)) }}
                                 </td>
 
                                 <td class="stock-value">
                                     <strong>
-                                        {{ stock.stock_sacs }}
+                                        {{ format_number_after(format_number(stock.stock_sacs)) }}
                                     </strong>
                                 </td>
 
@@ -394,8 +394,8 @@
                                 <td>{{ c.produit }}</td>
                                 <td>{{ c.type_mouvement }}</td>
                                 <td>{{ c.date_mouvement }}</td>
-                                <td>{{ c.quantite_poids }}</td>
-                                <td>{{ c.nombre_sacs }}</td>
+                                <td>{{ format_number_after(format_number(c.quantite_poids)) }}</td>
+                                <td>{{ format_number_after(format_number(c.nombre_sacs)) }}</td>
                                 <td>{{ c.campagne }}</td>
                                 <td>
                                     <button class="edit-btn"><a href="/stocks/edit/{{ c.id }}">✏️ Modifier</a></button>

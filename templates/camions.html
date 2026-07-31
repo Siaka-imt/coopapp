@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camions</title>
+    <title>Transports</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -79,7 +79,7 @@
                 <div class="sidebar-section-title">OPÉRATIONS</div>
                 <ul class="sidebar-nav">
                     <li class="sidebar-nav-item">
-                        <a href="/zones" class="sidebar-nav-link ">
+                        <a href="/zones" class="sidebar-nav-link">
                             <span class="sidebar-nav-icon">📍</span>
                             <span>Zones</span>
                         </a>
@@ -103,9 +103,9 @@
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
-                        <a href="/camions" class="sidebar-nav-link active">
+                        <a href="/transports" class="sidebar-nav-link active">
                             <span class="sidebar-nav-icon">🚚</span>
-                            <span>Camions</span>
+                            <span>Transports</span>
                         </a>
                     </li>
                     <li class="sidebar-nav-item">
@@ -125,8 +125,8 @@
         <div class="topbar">
 
             <div class="header-left">
-                <h1>Camions</h1>
-                <p>Gestion des camions</p>
+                <h1>Transports</h1>
+                <p>Gestion des livraisons</p>
             </div>
 
             <div class="header-center">
@@ -136,7 +136,7 @@
                 </div>
             </div>
 
-            <div class="profile-menu">
+           <div class="profile-menu">
 
                 <button class="profile-btn">
                     {% if photo %}
@@ -162,63 +162,217 @@
                 </div>
 
             </div>
+
         </div>
         <div class="actions-bar">
             <div class="export-buttons">
-                <a href="/camions/export/excel" class="excel-btn">
+                <a href="/transports/export/excel" class="excel-btn">
                     📊 Export Excel
                 </a>
 
-                <a href="/camions/export/pdf" class="pdf-btn">
+                <a href="/transports/export/pdf" class="pdf-btn">
                     📄 Export PDF
                 </a>
             </div>
             <div class="m-search">
-                <form method="GET" action="/camions">
+                <form method="GET" action="/transports">
                     <input
                         type="text"
                         name="search"
-                        placeholder="Rechercher un camion..."
+                        placeholder="Rechercher client, destination ou campagne..."
                         value="{{ request.args.get('search', '') }}"
                     >
                     <button type="submit">🔍</button>
                 </form>
             </div>
         </div>
-        <div class="stats-grid-client-pisteur">
+        <div class="stats-grid-stock">
+            <div class="stat-card green">
+                <h4>Total livraison</h4>
+                <p>{{ format_number_after(format_number(total_livraisons)) }}</p>
+            </div>
             <div class="stat-card">
-                <h4>Total Camions</h4>
-                <p>{{ camions|length }}</p>
+                <h4>Poids Total</h4>
+                <p>{{ format_number_after(format_number(total_poids)) }}</p>
+            </div>
+            <div class="stat-card">
+                <h4>Sacs Total</h4>
+                <p>{{ format_number_after(format_number(total_sacs)) }}</p>
             </div>
         </div>
         <div class="settings-container">
-            <!-- FORMULAIRE -->
-            <div class="card">
-                <h3>📥 Ajouter un camion</h3>
+            <div class="card stock-summary-card">
 
-                <form method="POST" action="/camions/add" class="stock-filter">
-                    <input name="numero" placeholder="Numéro" required>
-                    <input name="date_depart" type="date" placeholder="Date de départ" required>
-                    <input name="date_retour" type="date" placeholder="Date de retour" required>
-                    <input name="destination" placeholder="Destination" required>
-                    <input name="usager" placeholder="Usager" required>
-                    <button type="submit">Ajouter</button>
-                </form>
-            </div>
-
-            <!-- TABLE -->
-            <div class="card">
-                <h3>📋 Liste des camions</h3>
+                <h3>Livraisons effectuées</h3>
 
                 <div class="table-container">
-                    <table class="table">
+
+                    <table class="table stock-summary-table">
+
                         <thead>
                             <tr class="table-group-header">
-                                <th>Numéro</th>
-                                <th>Date de départ</th>
-                                <th>Date de retour</th>
+                                <th>Campagne</th>
+                                <th>Client</th>
                                 <th>Destination</th>
-                                <th>Usager</th>
+                                <th>Livraisons</th>
+                                <th>Qté poids</th>
+                                <th>Nombre Sacs</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for mission in mission_summary %}
+
+                            <tr>
+
+                                <td>{{ mission.campagne }}</td>
+
+                                <td>{{ mission.client }}</td>
+
+                                <td>
+                                    {{ mission.destination or '' }}
+                                </td>
+
+                                <td>
+                                    {{ format_number_after(format_number(mission.nombre_camions)) }}
+                                </td>
+
+                                <td class="stock-value">
+                                    <strong>
+                                        {{ format_number_after(format_number(mission.poids_total)) }}
+                                    </strong>
+                                </td>
+
+                                <td class="stock-value">
+                                    <strong>
+                                        {{ format_number_after(format_number(mission.sacs_total)) }}
+                                    </strong>
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr>
+                                <td colspan="8">
+                                    Aucune livraison enregistrée.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+            
+            
+            <!-- FORMULAIRE -->
+            <div class="card">
+
+                <h3>📥 Ajouter une livraison</h3>
+
+                    <form method="POST" action="/transports/add" class="stock-filter">
+                        <input name="camion" placeholder="N° Camion" required>
+                        <input name="client" placeholder="Client" required>
+                        <select name="campagne" placeholder="Campagne" required>
+                            <option value="" disabled selected>Choisir une campagne</option>
+                            <option value="CAJOU 2026">CAJOU 2026</option>
+                            <option value="KARITE 2026">KARITE 2026</option>
+                            <option value="RIZ 2026">RIZ 2026</option>
+                            <option value="SOJA 2026">SOJA 2026</option>
+                            <option value="MAÏS 2026">MAÏS 2026</option>
+                            <option value="CAJOU 2027">CAJOU 2027</option>
+                            <option value="KARITE 2027">KARITE 2027</option>
+                            <option value="RIZ 2027">RIZ 2027</option>
+                            <option value="SOJA 2027">SOJA 2027</option>
+                            <option value="MAÏS 2027">MAÏS 2027</option>
+                            <option value="CAJOU 2028">CAJOU 2028</option>
+                            <option value="KARITE 2028">KARITE 2028</option>
+                            <option value="RIZ 2028">RIZ 2028</option>
+                            <option value="SOJA 2028">SOJA 2028</option>
+                            <option value="MAÏS 2028">MAÏS 2028</option>
+                        </select>
+                        <input type="date" name="date_depart" placeholder="Date de depart" required>
+                        <input name="destination" placeholder="Destination" required>
+                        <input name="quantite_poids" placeholder="Poids (kg)" required>
+                        <input name="nombre_sacs" placeholder="Nombre sacs" required>
+                        <select name="etat" required>
+                            <option value="" disabled selected>Choisir un etat</option>
+                            <option value="LIVRE">LIVRE</option>
+                            <option value="LIVRAISON EN COURS">EN COURS DE LIVRAISON</option>
+                        </select>
+                        <button type="submit">Enregistrer</button>
+                    </form>
+            </div>
+            <div class="card filter-card">
+
+                <h3>🔎 Filtrer</h3>
+
+                    <form method="GET" action="/transports" class="stock-filter">
+
+                        <select name="client">
+                            <option value="">Tous les clients</option>
+
+                            {% for c in clients %}
+                                <option value="{{ c.client }}"
+                                    {% if client_selected == c.client %}selected{% endif %}>
+                                    {{ c.client }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <select name="campagne">
+                            <option value="">Toutes les campagnes</option>
+
+                            {% for c in campagnes %}
+                                <option value="{{ c.campagne }}"
+                                    {% if campagne_selected == c.campagne %}selected{% endif %}>
+                                    {{ c.campagne }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <select name="type">
+                            <option value="">Tous les etat</option>
+                            <option value="LIVRE">ENTREE</option>
+                            <option value="LIVRAISON EN COURS">EN COURS DE LIVRAISON</option>
+                        </select>
+
+                        <input type="date" name="date_depart">
+
+                        <button type="submit" class="filter-btn">
+                            Filtrer
+                        </button>
+
+                        <a href="/transports" class="reset-btn">
+                            Réinitialiser
+                        </a>
+
+                    </form>
+
+            </div>
+            <!-- TABLE -->
+            <div class="card">
+
+                <h3>🕒 Historique des livraisons</h3>
+                
+                <div class="table-container">
+                    <table class="table ">
+                        <thead>
+                            <tr class="table-group-header">
+                                <th>N° Camion</th>
+                                <th>Client</th>
+                                <th>Campagne</th>
+                                <th>Date depart</th>
+                                <th>Destination</th>
+                                <th>Qté poids</th>
+                                <th>Nombre Sacs</th>
+                                <th>Etat</th>
                                 <th>Modifier</th>
                                 <th>Supprimer</th>
                             </tr>
@@ -227,18 +381,21 @@
                         <tbody>
                             {% for c in camions %}
                             <tr>
-                                <td>{{ c.numero }}</td>
+                                <td>{{ c.camion }}</td>
+                                <td>{{ c.client }}</td>
+                                <td>{{ c.campagne }}</td>
                                 <td>{{ c.date_depart }}</td>
-                                <td>{{ c.date_retour }}</td>
                                 <td>{{ c.destination }}</td>
-                                <td>{{ c.usager }}</td>
+                                <td>{{ format_number_after(format_number(c.quantite_poids)) }}</td>
+                                <td>{{ format_number_after(format_number(c.nombre_sacs)) }}</td>
+                                <td>{{ c.etat }}</td>
                                 <td>
-                                    <button class="edit-btn"><a href="/camions/edit/{{ c.id }}">✏️ Modifier</a></button>
+                                    <button class="edit-btn"><a href="/transports/edit/{{ c.id }}">✏️ Modifier</a></button>
                                 </td> 
                                 <td>
-                                    <form method="POST" action="/camions/delete/{{ c.id }}">
+                                    <form method="POST" action="/transports/delete/{{ c.id }}">
                                         <button type="submit" class="delete-btn"
-                                                onclick="return confirm('Supprimer ce camion ?')">
+                                                onclick="return confirm('Supprimer cette ligne ?')">
                                             🗑 Supprimer
                                         </button>
                                     </form>
