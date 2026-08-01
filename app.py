@@ -71,7 +71,7 @@ def format_number_after(value):
 
 def recalculate_fiche_pisteur(pisteur, campagne):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
     # 🔥 récupérer toutes les lignes
     cursor.execute("""
         SELECT * FROM fiche_pisteur
@@ -140,7 +140,7 @@ def recalculate_fiche_pisteur(pisteur, campagne):
 
 def recalculate_fiche_client(client, campagne):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     # 🔥 récupérer toutes les lignes du client
     cursor.execute("""
@@ -220,7 +220,7 @@ def login():
         password = request.form["password"]
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
 
         cursor.execute("SELECT * FROM utilisateur WHERE email = %s", (email,))
         user = cursor.fetchone()
@@ -242,7 +242,7 @@ def forgot_password():
         email = request.form["email"]
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
 
         cursor.execute(
             "SELECT * FROM utilisateur WHERE email=%s",
@@ -288,7 +288,7 @@ def forgot_password():
 def reset_password(token):
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("""
         SELECT *
@@ -515,7 +515,7 @@ def clients():
     search = request.args.get("search", "").strip()
     
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary = True)
+    cursor = conn.cursor(dictionary = True, buffered=True)
 
     cursor.execute("SELECT DISTINCT campagne FROM client")
     campagnes = cursor.fetchall()
@@ -557,7 +557,7 @@ def add_client():
     localisation = request.form["localisation"]
     campagne = request.form["campagne"]
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute(
         "INSERT INTO client (contact, nom, localisation, campagne) VALUES (%s, %s, %s, %s)",
@@ -569,7 +569,7 @@ def add_client():
 @app.route("/clients/delete/<int:id>", methods=["POST"])
 def delete_client(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("DELETE FROM client WHERE id = %s", (id,))
 
@@ -579,7 +579,7 @@ def delete_client(id):
 @app.route("/clients/edit/<int:id>", methods=["GET"])
 def edit_client(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM client WHERE id = %s", (id,))
     client = cursor.fetchone()
@@ -593,7 +593,7 @@ def update_client(id):
     campagne = request.form["campagne"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         UPDATE client 
@@ -737,7 +737,7 @@ def select_client(nom):
 @app.route("/clients/<nom>")
 def voir_client(nom):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("SELECT * FROM fiche_client WHERE client = %s", (nom,))
     client = cursor.fetchall()
@@ -757,7 +757,7 @@ def delete_client_fiche(id):
         return redirect("/")
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("SELECT client, campagne FROM fiche_client WHERE id = %s", (id,))
     result = cursor.fetchone()
@@ -779,7 +779,7 @@ def delete_client_fiche(id):
 @app.route("/clients/edit_fiche/<int:id>", methods = ["GET"])
 def edit_fiche_client(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary = True)
+    cursor = conn.cursor(dictionary = True, buffered=True)
 
     cursor.execute("SELECT * FROM fiche_client WHERE id = %s", (id,))
     client = cursor.fetchone()
@@ -799,7 +799,7 @@ def update_fiche_client(id):
     campagne = request.form["campagne"]
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary = True)
+    cursor = conn.cursor(dictionary = True, buffered=True)
 
     cursor.execute("SELECT client FROM fiche_client WHERE id = %s", (id,))
     result = cursor.fetchone()
@@ -840,7 +840,7 @@ def add_fiche_client():
     campagne = request.form["campagne"]
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     # 🔥 dernière ligne du pisteur pour cette campagne
     cursor.execute("""
@@ -912,7 +912,7 @@ def export_clients_excel():
 def export_clients_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         SELECT nom, contact, localisation
@@ -1026,7 +1026,7 @@ def export_fiche_clients_excel(nom):
 def export_fiche_clients_pdf(nom):
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         SELECT date, montant, cumul, date_dechargement, numero_camion, numero_fiche, poids_net, cumul_poids_net, prix, montant_livraison, cumul_montant_livraison, resultat_livraison, sac_reçu, sac_livre, sac_restant, campagne
@@ -1128,7 +1128,7 @@ def pisteurs():
         return redirect("/")
     search = request.args.get("search", "").strip()
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT DISTINCT campagne FROM client")
     campagnes = cursor.fetchall()
@@ -1165,7 +1165,7 @@ def add_pisteur():
 @app.route("/pisteurs/delete/<int:id>", methods=["POST"])
 def delete_pisteur(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("DELETE FROM pisteur WHERE id = %s", (id,))
 
@@ -1175,7 +1175,7 @@ def delete_pisteur(id):
 @app.route("/pisteurs/edit/<int:id>", methods=["GET"])
 def edit_pisteur(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM pisteur WHERE id = %s", (id,))
     pisteur = cursor.fetchone()
@@ -1309,7 +1309,7 @@ def select_pisteur(nom):
 @app.route("/pisteurs/<nom>")
 def voir_pisteur(nom):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("SELECT * FROM fiche_pisteur WHERE pisteur = %s", (nom,))
     pisteur = cursor.fetchall()
@@ -1329,7 +1329,7 @@ def delete_pisteur_fiche(id):
         return redirect("/")
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("SELECT pisteur, campagne FROM fiche_pisteur WHERE id = %s", (id,))
     result = cursor.fetchone()
@@ -1351,7 +1351,7 @@ def delete_pisteur_fiche(id):
 @app.route("/pisteurs/edit_fiche/<int:id>", methods=["GET"])
 def edit_fiche_pisteur(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary = True)
+    cursor = conn.cursor(dictionary = True, buffered=True)
 
     cursor.execute("SELECT * FROM fiche_pisteur WHERE id = %s", (id,))
     pisteur = cursor.fetchone()
@@ -1374,7 +1374,7 @@ def update_fiche_pisteur(id):
     campagne = request.form["campagne"]
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT pisteur FROM fiche_pisteur WHERE id = %s", (id,))
     result = cursor.fetchone()
@@ -1416,7 +1416,7 @@ def add_fiche_pisteur():
     campagne = request.form["campagne"]
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     # 🔥 dernière ligne du pisteur pour cette campagne
     cursor.execute("""
@@ -1496,7 +1496,7 @@ def export_pisteurs_excel():
 def export_pisteurs_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         SELECT nom, contact, zone
@@ -1606,7 +1606,7 @@ def export_fiche_pisteurs_excel(nom):
 def export_fiche_pisteurs_pdf(nom):
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         SELECT detail, date, prix, poids_net, poids_cumul, debit, debit_cumul, credit, credit_cumul, solde, sac_reçu, sac_livre, sac_restant, campagne
@@ -1828,7 +1828,7 @@ def add_mission_camions():
     etat = request.form["etat"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered = True)
 
     cursor.execute(
         "INSERT INTO mission_camion (camion, client, campagne, date_depart, destination, quantite_poids, nombre_sacs, etat) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
@@ -1840,7 +1840,7 @@ def add_mission_camions():
 @app.route("/transports/delete/<int:id>", methods=["POST"])
 def delete_mission_camion(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered = True)
 
     cursor.execute("DELETE FROM mission_camion WHERE id = %s", (id,))
 
@@ -1850,7 +1850,7 @@ def delete_mission_camion(id):
 @app.route("/transports/edit/<int:id>", methods=["GET"])
 def edit_mission_camion(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM mission_camion WHERE id = %s", (id,))
     livraison = cursor.fetchone()
@@ -1901,7 +1901,7 @@ def export_mission_camion_excel():
 def export_mission_camion_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""SELECT
             camion,
@@ -2008,7 +2008,7 @@ def zones():
         return redirect("/")
     search = request.args.get("search", "").strip()
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
     if search:
         cursor.execute("""
             SELECT *
@@ -2034,7 +2034,7 @@ def add_zone():
     nombre_pisteur = request.form["nombre_pisteur"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute(
         "INSERT INTO zone (nom, nombre_pisteur) VALUES (%s, %s)",
@@ -2045,7 +2045,7 @@ def add_zone():
 @app.route("/zones/delete/<int:id>", methods=["POST"])
 def delete_zone(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("DELETE FROM zone WHERE id = %s", (id,))
 
@@ -2055,7 +2055,7 @@ def delete_zone(id):
 @app.route("/zones/edit/<int:id>", methods=["GET"])
 def edit_zone(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM zone WHERE id = %s", (id,))
     zone = cursor.fetchone()
@@ -2067,7 +2067,7 @@ def update_zone(id):
     nombre_pisteur = request.form["nombre_pisteur"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         UPDATE zone 
@@ -2099,7 +2099,7 @@ def export_zones_excel():
 def export_zones_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         SELECT nom, nombre_pisteur
@@ -2200,7 +2200,7 @@ def produits():
         return redirect("/")
     search = request.args.get("search", "").strip()
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
     if search:
         cursor.execute("""
             SELECT *
@@ -2224,7 +2224,7 @@ def add_produit():
     nom = request.form["nom"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute(
         "INSERT INTO produit (nom) VALUES (%s)",
@@ -2235,7 +2235,7 @@ def add_produit():
 @app.route("/produits/delete/<int:id>", methods=["POST"])
 def delete_produit(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("DELETE FROM produit WHERE id = %s", (id,))
 
@@ -2245,7 +2245,7 @@ def delete_produit(id):
 @app.route("/produits/edit/<int:id>", methods=["GET"])
 def edit_produit(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM produit WHERE id = %s", (id,))
     produit = cursor.fetchone()
@@ -2256,7 +2256,7 @@ def update_produit(id):
     nom = request.form["nom"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         UPDATE produit 
@@ -2288,7 +2288,7 @@ def export_produits_excel():
 def export_produits_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         SELECT nom
@@ -2525,7 +2525,7 @@ def add_stock():
     campagne = request.form["campagne"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute(
         "INSERT INTO mouvement_stock (produit, type_mouvement, quantite_poids, nombre_sacs, date_mouvement," \
@@ -2538,7 +2538,7 @@ def add_stock():
 @app.route("/stocks/delete/<int:id>", methods=["POST"])
 def delete_stock(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("DELETE FROM mouvement_stock WHERE id = %s", (id,))
 
@@ -2548,7 +2548,7 @@ def delete_stock(id):
 @app.route("/stocks/edit/<int:id>", methods=["GET"])
 def edit_stock(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM mouvement_stock WHERE id = %s", (id,))
     stock = cursor.fetchone()
@@ -2565,7 +2565,7 @@ def update_stock(id):
     created_at = request.form["created_at"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         UPDATE mouvement_stock
@@ -2599,7 +2599,7 @@ def export_stocks_excel():
 def export_stocks_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""SELECT
             created_at,
@@ -2705,7 +2705,7 @@ def campagnes():
         return redirect("/")
     search = request.args.get("search", "").strip()
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     if search:
         cursor.execute("""
@@ -2732,7 +2732,7 @@ def add_campagne():
     statut = request.form["statut"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute(
         "INSERT INTO campagne (nom, statut) VALUES (%s, %s)",
@@ -2743,7 +2743,7 @@ def add_campagne():
 @app.route("/campagnes/delete/<int:id>", methods=["POST"])
 def delete_campagne(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("DELETE FROM campagne WHERE id = %s", (id,))
 
@@ -2753,7 +2753,7 @@ def delete_campagne(id):
 @app.route("/campagnes/edit/<int:id>", methods=["GET"])
 def edit_campagne(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM campagne WHERE id = %s", (id,))
     campagne = cursor.fetchone()
@@ -2765,7 +2765,7 @@ def update_campagne(id):
     statut = request.form["statut"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         UPDATE campagne 
@@ -2797,7 +2797,7 @@ def export_campagnes_excel():
 def export_campagnes_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute(""" SELECT nom, statut FROM campagne """)
 
@@ -2962,7 +2962,7 @@ def clients_statistiques():
     if "user" not in session:
         return redirect("/")
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
     # 👉 récupérer les campagnes disponibles
     cursor.execute("SELECT DISTINCT campagne FROM fiche_client")
     campagnes = cursor.fetchall()
@@ -3041,7 +3041,7 @@ def pisteurs_statistiques():
     if "user" not in session:
         return redirect("/")
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
     # 👉 récupérer les campagnes disponibles
     cursor.execute("SELECT DISTINCT campagne FROM fiche_pisteur")
     campagnes = cursor.fetchall()
@@ -3117,7 +3117,7 @@ def users():
     search = request.args.get("search", "").strip()
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     if search:
         cursor.execute("""
@@ -3148,7 +3148,7 @@ def add_user():
     hashed = hashlib.sha256(password.encode()).hexdigest()
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute(
         "INSERT INTO utilisateur (email,username, password, role) VALUES (%s, %s, %s, %s)",
@@ -3160,7 +3160,7 @@ def add_user():
 @app.route("/users/delete/<int:id>", methods=["POST"])
 def delete_user(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("DELETE FROM utilisateur WHERE id = %s", (id,))
 
@@ -3170,7 +3170,7 @@ def delete_user(id):
 @app.route("/users/edit/<int:id>", methods=["GET"])
 def edit_user(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     cursor.execute("SELECT * FROM utilisateur WHERE id = %s", (id,))
     user = cursor.fetchone()
@@ -3184,7 +3184,7 @@ def update_user(id):
     role = request.form["role"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
     if password:
         hashed = hashlib.sha256(password.encode()).hexdigest()
         password_final = hashed
@@ -3225,7 +3225,7 @@ def export_users_excel():
 def export_users_pdf():
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
 
     cursor.execute("""
         SELECT username, email, role
@@ -3326,7 +3326,7 @@ def profil():
         return redirect("/")
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True, buffered=True)
 
     # récupération de l'utilisateur connecté
     cursor.execute(
