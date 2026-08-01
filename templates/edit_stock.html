@@ -24,16 +24,13 @@
                 </div>
                 <div class="form-row">
                     <label>Nom du produit</label>
-                    <input name="produit" value="{{ stock.produit }}">
-                </div>
-                <div class="form-row">
-                    <label>Nom du produit</label>
                     <select name="produit">
                         <option value="cajou" {% if stock.produit == "cajou" %}selected{% endif %}>cajou</option>
                         <option value="karite" {% if stock.produit == "karite" %}selected{% endif %}>karite</option>
                         <option value="riz" {% if stock.produit == "riz" %}selected{% endif %}>riz</option>
                         <option value="soja" {% if stock.produit == "soja" %}selected{% endif %}>soja</option>
                         <option value="maïs" {% if stock.produit == "maïs" %}selected{% endif %}>maïs</option>
+                        <option value="sacherie" {% if stock.produit == "sacherie" %}selected{% endif %}>sacherie</option>
                     </select>
                 </div>
                 <div class="form-row">
