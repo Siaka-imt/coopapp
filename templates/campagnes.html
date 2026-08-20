@@ -198,7 +198,11 @@
 
                 <form method="POST" action="/campagnes/add" class="stock-filter">
                     <input name="nom" placeholder="Nom" required>
-                    <input name="statut" placeholder="Statut" required>
+                    <select name="statut" required>
+                        <option value="" disabled selected>Choisir un statut</option>
+                        <option value="Active">Active</option>
+                        <option value="Terminée">Terminée</option>
+                    </select>
                     <button type="submit">Ajouter</button>
                 </form>
             </div>

@@ -1155,6 +1155,27 @@ def add_pisteur():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Vérifier si la zone existe
+    cursor.execute(
+        "SELECT id FROM zone WHERE nom = %s",
+        (zone,)
+    )
+
+    zone_existante = cursor.fetchone()
+
+    if zone_existante:
+        # La zone existe → +1 pisteur
+        cursor.execute(
+            "UPDATE zone SET nombre_pisteur = nombre_pisteur + 1 WHERE id = %s",
+            (zone_existante[0],)
+        )
+    else:
+        # Nouvelle zone → création avec 1 pisteur
+        cursor.execute(
+            "INSERT INTO zone (nom, nombre_pisteur) VALUES (%s, 1)",
+            (zone,)
+        )
+
     cursor.execute(
         "INSERT INTO pisteur (nom, contact, campagne, zone) VALUES (%s, %s, %s, %s)",
         (nom, contact, campagne, zone)
@@ -1167,6 +1188,21 @@ def delete_pisteur(id):
     conn = get_db_connection()
     cursor = conn.cursor(buffered=True)
 
+    # Vérifier si la zone existe
+    cursor.execute(
+        "SELECT nom FROM pisteur WHERE id = %s",
+        (id,)
+    )
+
+    zone_existante = cursor.fetchone()
+    cursor.execute(
+        "UPDATE zone SET nombre_pisteur = nombre_pisteur - 1 WHERE nom = %s",
+        (zone_existante[0],)
+    )
+    cursor.execute(
+        "DELETE FROM zone WHERE nom = %s AND nombre_pisteur <= 0",
+        (zone_existante[0],)
+    )
     cursor.execute("DELETE FROM pisteur WHERE id = %s", (id,))
 
     conn.commit()
@@ -1190,6 +1226,45 @@ def update_pisteur(id):
 
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Récupérer l'ancienne zone
+    cursor.execute(
+        "SELECT zone FROM pisteur WHERE id = %s",
+        (id,)
+    )
+
+    ancienne_zone = cursor.fetchone()[0]
+
+    if ancienne_zone != zone:
+        # Décrémenter le nombre de pisteurs dans l'ancienne zone
+        cursor.execute(
+            "UPDATE zone SET nombre_pisteur = nombre_pisteur - 1 WHERE nom = %s",
+            (ancienne_zone,)
+        )
+
+        # Vérifier si la nouvelle zone existe
+        cursor.execute(
+            "SELECT id FROM zone WHERE nom = %s",
+            (zone,)
+        )
+
+        nouvelle_zone_existante = cursor.fetchone()
+
+        if nouvelle_zone_existante:
+            # La nouvelle zone existe → +1 pisteur
+            cursor.execute(
+                "UPDATE zone SET nombre_pisteur = nombre_pisteur + 1 WHERE id = %s",
+                (nouvelle_zone_existante[0],)
+            )
+        else:
+            # Nouvelle zone → création avec 1 pisteur
+            cursor.execute(
+                "INSERT INTO zone (nom, nombre_pisteur) VALUES (%s, 1)",
+                (zone,)
+            )
+    else:
+        # La zone n'a pas changé, donc on ne fait rien pour les zones
+        pass
 
     cursor.execute("""
         UPDATE pisteur 
